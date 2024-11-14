@@ -49,16 +49,11 @@ use crate::{
 )]
 pub struct PersistentList<T, N, B = MinimumBundleSize<T>> {
     root: Option<Arc<Hc<Node<T, B>>>>,
-    // TODO(32-bit support): Consider changing the type of `length` to `u64`.
+    // TODO(32-bit support): change `length` type to `u64`:
     //
-    //                       Persistent lists could have more than `usize::MAX` elements due to
-    //                       structural sharing, but changing the type of `PersistentList.length`
-    //                       may necessitate intrusive changes to the rest of this crate.
-    //
-    //                       `VALIDATOR_REGISTRY_LIMIT` is 2 ** 40 in the mainnet preset,
-    //                       but the number of validators will likely stay far below the maximum.
-    //                       Also, `Validator` containers do not benefit from structural sharing,
-    //                       so that many validators would not fit in memory on 32 bit machines.
+    // on 32-bit platforms the length limit with usize is 4294967296,
+    // however, some use cases of `PersistentList` require higher limit
+    // (e.g. `ValidatorRegistryLimit` on Mainnet is 1099511627776).
     length: usize,
     phantom: PhantomData<N>,
 }
