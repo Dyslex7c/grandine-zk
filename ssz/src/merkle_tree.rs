@@ -115,7 +115,7 @@ impl<D: ArrayLength<H256>> MerkleTree<D> {
     }
 
     pub fn push(&mut self, index: usize, chunk: H256) -> (usize, H256) {
-        // TODO: TODO(32-bit support): either remove `assert!` or change index type to `u64`
+        // TODO(32-bit support): either remove `assert!` or change index type to `u64`
         let index_u64: u64 = index.try_into().expect("usize should fit in u64");
         assert!(index_u64 < 1 << D::U64);
 
