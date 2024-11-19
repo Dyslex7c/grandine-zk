@@ -12,8 +12,6 @@ use helper_functions::{
     slot_report::{NullSlotReport, SlotReport},
     verifier::{SingleVerifier, Triple, Verifier},
 };
-use pubkey_cache::PubkeyCache;
-use rayon::iter::{IntoParallelRefIterator as _, ParallelIterator as _};
 use typenum::Unsigned as _;
 use types::{
     config::Config,
@@ -189,7 +187,7 @@ fn process_operations<P: Preset, V: Verifier>(
 
         let triples = body
             .attestations
-            .par_iter()
+            .iter()
             .map(|attestation| {
                 let mut triple = Triple::default();
 

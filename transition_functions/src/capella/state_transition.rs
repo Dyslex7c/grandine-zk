@@ -10,8 +10,6 @@ use helper_functions::{
     slot_report::SlotReport,
     verifier::{NullVerifier, Triple, Verifier, VerifierOption},
 };
-use pubkey_cache::PubkeyCache;
-use rayon::iter::{IntoParallelRefIterator as _, ParallelIterator as _};
 use ssz::Hc;
 use std_ext::ArcExt as _;
 use types::{
@@ -179,7 +177,7 @@ pub fn verify_signatures<P: Preset>(
         accessors::initialize_shuffled_indices(state, attestations)?;
 
         let triples = attestations
-            .par_iter()
+            .iter()
             .map(|attestation| {
                 let indexed_attestation = phase0::get_indexed_attestation(state, attestation)?;
 

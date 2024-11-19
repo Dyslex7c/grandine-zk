@@ -13,8 +13,6 @@ use helper_functions::{
     verifier::{SingleVerifier, Triple, Verifier},
 };
 use itertools::izip;
-use pubkey_cache::PubkeyCache;
-use rayon::iter::{IntoParallelRefIterator as _, ParallelIterator as _};
 use ssz::SszHash as _;
 use tap::Pipe as _;
 use typenum::{NonZero, Unsigned as _};
@@ -281,7 +279,7 @@ pub fn process_operations<P: Preset, V: Verifier>(
 
         let triples = body
             .attestations()
-            .par_iter()
+            .iter()
             .map(|attestation| {
                 let mut triple = Triple::default();
 

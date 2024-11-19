@@ -8,7 +8,6 @@ use bls::{
 };
 use derive_more::Constructor;
 use enumset::{EnumSet, EnumSetType};
-use rayon::iter::{IntoParallelRefIterator as _, ParallelBridge as _, ParallelIterator as _};
 use static_assertions::assert_not_impl_any;
 use tap::TryConv as _;
 use types::phase0::primitives::H256;
@@ -308,7 +307,7 @@ impl Verifier for MultiVerifier {
 
         let signatures = self
             .triples
-            .par_iter()
+            .iter()
             .map(|triple| triple.signature_bytes.try_into())
             .collect::<Result<Vec<_>, _>>()?;
 
@@ -398,6 +397,14 @@ impl Verifier for Triple {
             .par_bridge()
             .fold(AggregatePublicKey::default, |a, b| a.aggregate(&b))
             .reduce(AggregatePublicKey::default, |a, b| a.aggregate(&b));
+
+        #[cfg(target_os = "zkvm")]
+        let public_key = public_keys
+            .into_iter()
+            .copied()
+            .fold(AggregatePublicKey::default(), |acc, pubkey| {
+                acc.aggregate(pubkey)
+            });
 
         *self = Self::new(message, signature_bytes, Arc::new(public_key));
 
