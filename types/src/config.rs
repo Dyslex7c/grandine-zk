@@ -717,6 +717,62 @@ impl Config {
         }
     }
 
+    // [Pectra devnet 4 configuration](https://github.com/ethpandaops/pectra-devnets/blob/4bca4dc1004d9ce6a941272e4b0dfd58243903b2/network-configs/devnet-4/metadata/config.yaml)
+    #[must_use]
+    pub fn pectra_devnet_4() -> Self {
+        Self {
+            // Meta
+            config_name: Cow::Borrowed("testnet"),
+
+            // Genesis
+            genesis_delay: 60,
+            genesis_fork_version: H32(hex!("10357071")),
+            min_genesis_active_validator_count: nonzero!(10_000_u64),
+            min_genesis_time: 1_729_268_862,
+
+            // Forking
+            altair_fork_epoch: 0,
+            altair_fork_version: H32(hex!("20357071")),
+            bellatrix_fork_epoch: 0,
+            bellatrix_fork_version: H32(hex!("30357071")),
+            capella_fork_epoch: 0,
+            capella_fork_version: H32(hex!("40357071")),
+            deneb_fork_epoch: 0,
+            deneb_fork_version: H32(hex!("50357071")),
+            electra_fork_epoch: 5,
+            electra_fork_version: H32(hex!("60357071")),
+            eip7594_fork_epoch: 99999,
+
+            // Time parameters
+            min_validator_withdrawability_delay: 2,
+            seconds_per_eth1_block: 12,
+            shard_committee_period: 256,
+
+            // Validator cycle
+            churn_limit_quotient: nonzero!(128_u64),
+
+            // Deposit contract
+            deposit_chain_id: 7_042_905_162,
+            deposit_contract_address: H160(hex!("4242424242424242424242424242424242424242")),
+            deposit_network_id: 7_042_905_162,
+
+            // Networking
+            max_request_blocks: 1024,
+
+            // Transition
+            terminal_block_hash: ExecutionBlockHash::zero(),
+            terminal_block_hash_activation_epoch: FAR_FUTURE_EPOCH,
+            terminal_total_difficulty: Difficulty::from_be_bytes(hex!(
+                "0000000000000000000000000000000000000000000000000000000000000000"
+            )),
+
+            // Custody
+            samples_per_slot: 8,
+
+            ..Self::default()
+        }
+    }
+
     /// Modifies `self` to start in `phase` but never upgrade.
     ///
     /// This is needed to run `consensus-spec-tests`.
