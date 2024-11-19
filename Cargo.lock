@@ -843,7 +843,7 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_utils",
- "sha2 0.10.8",
+ "sha2 0.10.8 (git+https://github.com/risc0/RustCrypto-hashes.git?tag=sha2-v0.10.8-risczero.0)",
  "shuffling",
  "ssz",
  "std_ext",
@@ -2299,7 +2299,7 @@ dependencies = [
  "ed25519",
  "rand_core 0.6.4",
  "serde",
- "sha2 0.10.8",
+ "sha2 0.10.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "subtle",
  "zeroize",
 ]
@@ -2335,7 +2335,7 @@ dependencies = [
  "serde_json",
  "serde_utils",
  "serde_with",
- "sha2 0.10.8",
+ "sha2 0.10.8 (git+https://github.com/risc0/RustCrypto-hashes.git?tag=sha2-v0.10.8-risczero.0)",
  "tap",
  "test-case",
  "thiserror 1.0.69",
@@ -2351,7 +2351,7 @@ dependencies = [
  "duplicate",
  "num-traits",
  "serde",
- "sha2 0.10.8",
+ "sha2 0.10.8 (git+https://github.com/risc0/RustCrypto-hashes.git?tag=sha2-v0.10.8-risczero.0)",
  "spec_test_utils",
  "ssz",
  "test-generator",
@@ -2699,7 +2699,7 @@ dependencies = [
  "rand 0.8.5",
  "regex",
  "serde",
- "sha2 0.10.8",
+ "sha2 0.10.8 (git+https://github.com/risc0/RustCrypto-hashes.git?tag=sha2-v0.10.8-risczero.0)",
  "slog",
  "slog-async",
  "slog-term",
@@ -3380,7 +3380,7 @@ dependencies = [
  "rand 0.8.5",
  "regex",
  "serde",
- "sha2 0.10.8",
+ "sha2 0.10.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "tracing",
  "void",
  "web-time",
@@ -3545,8 +3545,8 @@ dependencies = [
  "ethereum-types",
  "generic-array",
  "hex-literal",
- "itertools 0.14.0",
- "sha2 0.10.8",
+ "itertools 0.13.0",
+ "sha2 0.10.8 (git+https://github.com/risc0/RustCrypto-hashes.git?tag=sha2-v0.10.8-risczero.0)",
 ]
 
 [[package]]
@@ -4611,7 +4611,7 @@ dependencies = [
  "ecdsa",
  "elliptic-curve",
  "once_cell",
- "sha2 0.10.8",
+ "sha2 0.10.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "signature",
 ]
 
@@ -4670,8 +4670,8 @@ name = "kzg"
 version = "0.1.0"
 source = "git+https://github.com/grandinetech/rust-kzg.git#21670cd7544ebf25f4b6ae1bf99bbced6cae1967"
 dependencies = [
- "sha2 0.10.8",
- "siphasher",
+ "blst",
+ "sha2 0.10.8 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -4887,7 +4887,8 @@ dependencies = [
  "rand 0.8.5",
  "regex",
  "serde",
- "sha2 0.10.8",
+ "sha2 0.10.8 (registry+https://github.com/rust-lang/crates.io-index)",
+ "smallvec",
  "tracing",
  "web-time",
 ]
@@ -4930,8 +4931,8 @@ dependencies = [
  "rand 0.8.5",
  "sec1",
  "serde",
- "sha2 0.10.8",
- "thiserror 1.0.69",
+ "sha2 0.10.8 (registry+https://github.com/rust-lang/crates.io-index)",
+ "thiserror",
  "tracing",
  "zeroize",
 ]
@@ -4956,7 +4957,7 @@ dependencies = [
  "quick-protobuf-codec",
  "rand 0.8.5",
  "serde",
- "sha2 0.10.8",
+ "sha2 0.10.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "smallvec",
  "thiserror 2.0.12",
  "tracing",
@@ -5033,7 +5034,8 @@ dependencies = [
  "multihash",
  "once_cell",
  "quick-protobuf",
- "rand 0.8.5",
+ "rand",
+ "sha2 0.10.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "snow",
  "static_assertions",
  "thiserror 2.0.12",
@@ -5990,7 +5992,7 @@ dependencies = [
  "ecdsa",
  "elliptic-curve",
  "primeorder",
- "sha2 0.10.8",
+ "sha2 0.10.8 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -6052,7 +6054,7 @@ dependencies = [
  "ecdsa",
  "elliptic-curve",
  "primeorder",
- "sha2 0.10.8",
+ "sha2 0.10.8 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -7114,8 +7116,8 @@ dependencies = [
  "num-traits",
  "pkcs1",
  "pkcs8",
- "rand_core 0.6.4",
- "sha2 0.10.8",
+ "rand_core",
+ "sha2 0.10.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "signature",
  "spki",
  "subtle",
@@ -7476,7 +7478,7 @@ dependencies = [
  "password-hash",
  "pbkdf2",
  "salsa20",
- "sha2 0.10.8",
+ "sha2 0.10.8 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -7776,6 +7778,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "sha2"
+version = "0.10.8"
+source = "git+https://github.com/risc0/RustCrypto-hashes.git?tag=sha2-v0.10.8-risczero.0#244dc3b08788f7a4ccce14c66896ae3b4f24c166"
+dependencies = [
+ "cfg-if",
+ "cpufeatures",
+ "digest 0.10.7",
+]
+
+[[package]]
 name = "sha3"
 version = "0.10.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -8049,7 +8061,7 @@ dependencies = [
  "rand_core 0.6.4",
  "ring",
  "rustc_version",
- "sha2 0.10.8",
+ "sha2 0.10.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "subtle",
 ]
 
@@ -9184,7 +9196,7 @@ dependencies = [
  "fs-err",
  "log",
  "serde_json",
- "sha2 0.10.8",
+ "sha2 0.10.8 (git+https://github.com/risc0/RustCrypto-hashes.git?tag=sha2-v0.10.8-risczero.0)",
  "ssz",
  "tap",
  "try_from_iterator",
