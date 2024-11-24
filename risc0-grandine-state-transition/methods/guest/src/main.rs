@@ -26,7 +26,8 @@ fn read_block_and_state<P: Preset>(config: &Config) -> Result<(SignedBeaconBlock
 }
 
 fn main() -> Result<()> {
-    let config = Config::pectra_devnet_4();
+    // use Config::pectra_devnet_4() for Pectra devnet-4;
+    let config = Config::mainnet();
 
     // ----------------
 
