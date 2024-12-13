@@ -424,7 +424,8 @@ serde_with = '3'
 serde_yaml = '0.9'
 # The `asm` feature in `sha2` doesn't do anything on recent `x86_64` CPUs
 # because `sha2` defaults to using CPU intrinsics.
-sha2 = { git = 'https://github.com/risc0/RustCrypto-hashes.git', tag = 'sha2-v0.10.8-risczero.0', features = ['compress'] }
+# sha2 = { git = 'https://github.com/risc0/RustCrypto-hashes.git', tag = 'sha2-v0.10.8-risczero.0', features = ['compress'] }
+sha2 = { git = "https://github.com/sp1-patches/RustCrypto-hashes", package = "sha2", tag = "sha2-v0.10.8-patch-v1" , features = ['compress'] }
 slog = { version = '2', features = ['max_level_trace'] }
 slog-async = '2'
 slog-stdlog = '4'
@@ -588,3 +589,5 @@ lto = false
 # `geth` responds to invalid payloads with objects containing `method` and `params`.
 # We had to fork `jsonrpc` because it does not allow nonstandard members.
 jsonrpc-core = { git = 'https://github.com/grandinetech/jsonrpc.git' }
+sha2-v0-10-8 = { git = "https://github.com/sp1-patches/RustCrypto-hashes", package = "sha2", tag = "sha2-v0.10.8-patch-v1" }
+
