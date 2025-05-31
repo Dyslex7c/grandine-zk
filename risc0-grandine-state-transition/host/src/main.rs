@@ -13,18 +13,18 @@ fn main() -> Result<()> {
     tracing_subscriber::fmt()
         .with_env_filter(tracing_subscriber::filter::EnvFilter::from_default_env())
         .init();
-/*
+
     // Uncomment this section if you want to run pectra-devnet-4 state transition at epoch boundary
-    let config = Config::pectra_devnet_4();
+    let config = Config::pectra_devnet_6();
 
     let block_ssz = std::fs::read(
-        "./data/pectra-devnet-4/block_224320_0xb6be0a7bc632809e85c9176db3f195418c29c1cfeab559be094de61339ba97ee.ssz",
+        "./data/pectra-devnet-6/beacon_block_slot_00000001_root_0x58602aaed9e485527f8fdaafef2000398a722d091eb6619c28c669acc69547ef.ssz",
     )?;
 
     let state_ssz = std::fs::read(
-        "./data/pectra-devnet-4/state_224319_0x7ece9f54e1112ba2b006ce90903015527e8bd4ca3c3abfff991c281b7dd19c4c.ssz",
+        "./data/pectra-devnet-6/genesis.ssz",
     )?;
-*/
+
 
 /*
     // Mainnet state transition (from slot 10468960 to new slot 10468961 in the same epoch)
@@ -41,14 +41,14 @@ fn main() -> Result<()> {
 
     // Mainnet state transition at epoch boundary (from slot 10468959 to new epoch slot 10468960)
     // You need to manually fetch the state
-    let config = Config::mainnet();
-    let block_ssz = std::fs::read(
-        "./data/mainnet/block_10468960_0xeae28f4c6fa0f5b04f8a87fdfa2441a81fba60c38c12f90eac49f4645e86fd5a.ssz",
-    )?;
+    // let config = Config::mainnet();
+    // let block_ssz = std::fs::read(
+    //     "./data/mainnet/block_10468960_0xeae28f4c6fa0f5b04f8a87fdfa2441a81fba60c38c12f90eac49f4645e86fd5a.ssz",
+    // )?;
 
-    let state_ssz = std::fs::read(
-        "./data/mainnet/state_10468959_0x2690153260fcb29717286bc8c450a702dda7a8880f0c9c62611b2d634a5069e4.ssz",
-    )?;
+    // let state_ssz = std::fs::read(
+    //     "./data/mainnet/state_10468959_0x2690153260fcb29717286bc8c450a702dda7a8880f0c9c62611b2d634a5069e4.ssz",
+    // )?;
     let started_at = Instant::now();
 
     let env = ExecutorEnv::builder()

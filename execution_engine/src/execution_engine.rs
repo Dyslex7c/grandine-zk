@@ -5,7 +5,7 @@ use std::{
 
 use anyhow::{ensure, Result};
 use either::Either;
-use eth2_libp2p::PeerId;
+use libp2p_identity::PeerId;
 use futures::channel::{mpsc::UnboundedSender, oneshot::Sender};
 use thiserror::Error;
 use types::{
