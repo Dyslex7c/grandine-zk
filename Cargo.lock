@@ -1110,7 +1110,7 @@ dependencies = [
  "rand 0.8.5",
  "serde",
  "serde_utils",
- "sha2 0.10.8",
+ "sha2 0.10.8 (git+https://github.com/risc0/RustCrypto-hashes.git?tag=sha2-v0.10.8-risczero.0)",
  "ssz",
  "static_assertions",
  "typenum",
@@ -3546,7 +3546,7 @@ dependencies = [
  "generic-array",
  "hex-literal",
  "itertools 0.14.0",
- "sha2 0.10.8",
+ "sha2 0.10.8 (git+https://github.com/risc0/RustCrypto-hashes.git?tag=sha2-v0.10.8-risczero.0)",
 ]
 
 [[package]]
@@ -4670,7 +4670,7 @@ name = "kzg"
 version = "0.1.0"
 source = "git+https://github.com/grandinetech/rust-kzg.git#21670cd7544ebf25f4b6ae1bf99bbced6cae1967"
 dependencies = [
- "sha2 0.10.8",
+ "sha2 0.10.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "siphasher",
 ]
 
@@ -4887,7 +4887,7 @@ dependencies = [
  "rand 0.8.5",
  "regex",
  "serde",
- "sha2 0.10.8",
+ "sha2 0.10.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "tracing",
  "web-time",
 ]
@@ -4930,7 +4930,7 @@ dependencies = [
  "rand 0.8.5",
  "sec1",
  "serde",
- "sha2 0.10.8",
+ "sha2 0.10.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "thiserror 1.0.69",
  "tracing",
  "zeroize",
@@ -7115,7 +7115,7 @@ dependencies = [
  "pkcs1",
  "pkcs8",
  "rand_core 0.6.4",
- "sha2 0.10.8",
+ "sha2 0.10.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "signature",
  "spki",
  "subtle",
