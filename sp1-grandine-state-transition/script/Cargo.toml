@@ -13,7 +13,7 @@ name = "evm"
 path = "src/bin/evm.rs"
 
 [dependencies]
-sp1-sdk = "3.4.0"
+sp1-sdk = "5.0.2"
 serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
 serde = { version = "1.0.200", default-features = false, features = ["derive"] }
 clap = { version = "4.0", features = ["derive", "env"] }
@@ -26,6 +26,7 @@ anyhow = '1.0.93'
 factory = { path = '../../factory' }
 ssz = { path = '../../ssz' }
 types = { path = '../../types' }
+bls = { path = '../../bls', features = ['zkcrypto'] }
 
 [build-dependencies]
-sp1-helper = "3.4.0"
+sp1-helper = "5.0.0"

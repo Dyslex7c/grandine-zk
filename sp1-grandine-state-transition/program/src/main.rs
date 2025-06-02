@@ -38,7 +38,7 @@ fn read_block_and_state<P: Preset>(
 
 pub fn main() {
     //let config = Config::pectra_devnet_4();
-    let config = Config::mainnet();
+    let config = Config::pectra_devnet_6();
 
     println!("loading block and state...");
 

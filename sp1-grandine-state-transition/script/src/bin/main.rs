@@ -41,7 +41,7 @@ struct Args {
 }
 
 fn main() -> Result<()> {
-    let config = Config::pectra_devnet_4();
+    let config = Config::pectra_devnet_6();
 
     println!("loading data...");
 
@@ -70,14 +70,16 @@ fn main() -> Result<()> {
 */
 
     let block_ssz = std::fs::read(
-        "./data/mainnet/block_10468960_0xeae28f4c6fa0f5b04f8a87fdfa2441a81fba60c38c12f90eac49f4645e86fd5a.ssz",
+        "../data/pectra-devnet-6/beacon_block_slot_00000001_root_0x58602aaed9e485527f8fdaafef2000398a722d091eb6619c28c669acc69547ef.ssz",
     )?;
+    println!("1");
 
-    let electra_block = DenebSignedBeaconBlock::<Mainnet>::from_ssz(&config, &block_ssz)?;
+    // let electra_block = DenebSignedBeaconBlock::<Mainnet>::from_ssz(&config, &block_ssz)?;
 
     let state_ssz = std::fs::read(
-        "./data/mainnet/state_10468959_0x2690153260fcb29717286bc8c450a702dda7a8880f0c9c62611b2d634a5069e4.ssz",
+        "../data/pectra-devnet-6/genesis.ssz",
     )?;
+    println!("2");
 
     // Setup the logger.
     sp1_sdk::utils::setup_logger();
@@ -104,7 +106,7 @@ fn main() -> Result<()> {
 
     if args.execute {
         // Execute the program
-        let (output, report) = client.execute(FIBONACCI_ELF, stdin).run().unwrap();
+        let (output, report) = client.execute(FIBONACCI_ELF, &stdin).run().unwrap();
         println!("Program executed successfully.");
 
         // Read the output.
@@ -136,7 +138,7 @@ fn main() -> Result<()> {
 
         // Generate the proof
         let proof = client
-            .prove(&pk, stdin)
+            .prove(&pk, &stdin)
             .run()
             .expect("failed to generate proof");
 

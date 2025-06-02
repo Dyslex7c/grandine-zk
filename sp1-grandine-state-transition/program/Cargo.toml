@@ -5,10 +5,11 @@ edition = "2021"
 
 [dependencies]
 alloy-sol-types = { workspace = true }
-sp1-zkvm = "3.4.0"
+sp1-zkvm = "5.0.0"
 fibonacci-lib = { path = "../lib" }
 
 anyhow = '1.0.93'
 ssz = { path = '../../ssz' }
 transition_functions = { path = '../../transition_functions' }
 types = { path = '../../types' }
+bls = { path = '../../bls', features = ['zkcrypto'] }
