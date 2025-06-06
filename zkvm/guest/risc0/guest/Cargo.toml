@@ -1,0 +1,21 @@
+[package]
+name = "risc0_grandine_state_transition"
+version = "0.1.0"
+edition = "2021"
+
+[workspace]
+
+[dependencies]
+anyhow = '1.0.93'
+risc0-zkvm = { version = "2.0.2", default-features = false, features = ['std', 'unstable'] }
+risc0-zkvm-platform = { version = "2.0.2", features = ['sys-getenv'] }
+bls = { path = '../../../../bls', features = ['zkcrypto', 'zkvm'] }
+ssz = { path = '../../../../ssz' }
+transition_functions = { path = '../../../../transition_functions' }
+types = { path = '../../../../types' }
+
+[patch.crates-io]
+sha2 = { git = 'https://github.com/ArtiomTr/RustCrypto-hashes.git', tag = 'sha2-v0.10.9-risczero.0', features = ['compress'] }
+
+[patch.'https://github.com/zkcrypto/bls12_381.git']
+bls12_381 = { git = "https://github.com/ArtiomTr/zkcrypto-bls12_381.git", tag = "bls12_381/main-risczero.0" }

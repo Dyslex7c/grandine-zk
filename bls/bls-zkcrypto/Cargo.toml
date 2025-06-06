@@ -14,6 +14,7 @@ fixed-hash = { workspace = true }
 itertools = { workspace = true }
 impl-serde = { workspace = true }
 rand = { workspace = true }
+rand_chacha = { workspace = true, optional = true }
 serde = { workspace = true }
 serde_utils = { workspace = true }
 sha2 = { workspace = true }
@@ -21,3 +22,8 @@ ssz = { workspace = true }
 static_assertions = { workspace = true }
 typenum = { workspace = true }
 zeroize = { workspace = true }
+
+[features]
+zkvm = [
+    "dep:rand_chacha",
+]

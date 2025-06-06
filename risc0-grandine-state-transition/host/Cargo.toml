@@ -13,4 +13,4 @@ serde = "1.0"
 anyhow = '1.0.93'
 factory = { path = '../../factory' }
 ssz = { path = '../../ssz' }
-types = { path = '../../types', features = ["zkcrypto"] }
+types = { path = '../../types' }

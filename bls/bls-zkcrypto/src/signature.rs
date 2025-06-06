@@ -9,9 +9,11 @@ use derive_more::From;
 use ff::Field;
 use itertools::Itertools as _;
 use rand::thread_rng;
+#[cfg(feature = "zkvm")]
+use rand_chacha::rand_core::SeedableRng;
 use sha2::Sha256;
 
-use super::{public_key::PublicKey, signature_bytes::SignatureBytes};
+use super::{public_key::PublicKey, signature_bytes::SignatureBytes, public_key_bytes::PublicKeyBytes};
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug, From)]
 pub struct Signature(G2Projective);
@@ -89,11 +91,35 @@ impl SignatureTrait for Signature {
         signatures: impl IntoIterator<Item = &'all Self>,
         public_keys: impl IntoIterator<Item = &'all PublicKey>,
     ) -> bool {
-        let mut rng = thread_rng();
-
         let msgs: Vec<&[u8]> = messages.into_iter().collect_vec();
         let sigs: Vec<&G2Projective> = signatures.into_iter().map(Self::as_raw).collect_vec();
         let pks: Vec<&G1Projective> = public_keys.into_iter().map(PublicKey::as_raw).collect_vec();
+
+        #[cfg(not(feature = "zkvm"))]
+        let mut rng = thread_rng();
+
+        #[cfg(feature = "zkvm")]
+        let mut rng = {
+            // use sha2::Digest;
+
+            // let mut sha = sha2::Sha256::new();
+
+            // for msg in &msgs {
+            //     sha.update(msg);
+            // }
+
+            // for sig in &sigs {
+            //     sha.update(&G2Affine::from(*sig).to_compressed());
+            // }
+
+            // for pk in &pks {
+            //     sha.update(&G1Affine::from(*pk).to_compressed());
+            // }
+
+            // let seed = sha.finalize();
+
+            rand_chacha::ChaCha20Rng::from_seed([0; 32])
+        };
 
         if msgs.len() != sigs.len() || sigs.len() != pks.len() {
             return false;

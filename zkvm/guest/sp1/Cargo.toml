@@ -1,0 +1,20 @@
+[package]
+name = 'zkvm_guest_sp1'
+edition = '2021'
+authors = ["Grandine <info@grandine.io>"]
+
+[workspace]
+
+[dependencies]
+anyhow = '1'
+ssz = { path = '../../../ssz' }
+transition_functions = { path = '../../../transition_functions' }
+types = { path = '../../../types' }
+bls = { path = '../../../bls', features = ['zkcrypto', 'zkvm'] }
+sp1-zkvm = '5.0.0'
+
+[patch.crates-io]
+sha2 =  { git = "https://github.com/sp1-patches/RustCrypto-hashes", package = "sha2", tag = "patch-sha2-0.10.8-sp1-4.0.0" }
+
+[patch.'https://github.com/zkcrypto/bls12_381.git']
+bls12_381 = { git = "https://github.com/sp1-patches/bls12_381", tag = "patch-0.8.0-sp1-5.0.0" }

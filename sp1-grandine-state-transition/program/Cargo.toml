@@ -12,4 +12,4 @@ anyhow = '1.0.93'
 ssz = { path = '../../ssz' }
 transition_functions = { path = '../../transition_functions' }
 types = { path = '../../types' }
-bls = { path = '../../bls', features = ['zkcrypto'] }
+bls = { path = '../../bls', features = ['zkcrypto', 'zkvm'] }

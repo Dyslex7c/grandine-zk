@@ -1,0 +1,57 @@
+use risc0_zkvm::guest::env;
+
+use anyhow::Result;
+use ssz::{SszRead as _, SszWrite as _};
+use transition_functions::combined::untrusted_state_transition as state_transition;
+use types::{
+    combined::{BeaconState, SignedBeaconBlock},
+    config::Config,
+    preset::{Mainnet, Preset},
+};
+
+fn read_block_and_state<P: Preset>(config: &Config) -> Result<(SignedBeaconBlock<P>, BeaconState<P>)> {
+    let state_ssz_len: usize = env::read();
+    let block_ssz_len: usize = env::read();
+
+    let mut block_ssz = vec![0_u8; block_ssz_len];
+    let mut state_ssz = vec![0_u8; state_ssz_len];
+
+    env::read_slice(&mut state_ssz);
+    env::read_slice(&mut block_ssz);
+
+    let block = SignedBeaconBlock::<P>::from_ssz(config, &block_ssz)?;
+    let state = BeaconState::<P>::from_ssz(config, &state_ssz)?;
+
+    Ok((block, state))
+}
+
+fn main() -> Result<()> {
+    // use Config::pectra_devnet_4() for Pectra devnet-4;
+    let config = Config::pectra_devnet_6();
+
+    // ----------------
+
+    let start = env::cycle_count();
+
+    let (block, mut state) = read_block_and_state::<Mainnet>(&config)?;
+
+    eprintln!("read input: {}", env::cycle_count() - start);
+
+    // ----------------
+
+    let start = env::cycle_count();
+
+    state_transition(&config, &mut state, &block)?;
+
+    eprintln!("state transition: {}", env::cycle_count() - start);
+
+    // ----------------
+
+    let start = env::cycle_count();
+
+    env::commit_slice(&state.to_ssz()?);
+
+    eprintln!("write output: {}", env::cycle_count() - start);
+
+    Ok(())
+}

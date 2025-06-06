@@ -39,5 +39,3 @@ test-generator = { workspace = true }
 
 [features]
 metrics = ['helper_functions/metrics', 'prometheus_metrics']
-blst = ['bls/blst', 'types/blst']
-zkcrypto = ['bls/zkcrypto', 'types/zkcrypto']
