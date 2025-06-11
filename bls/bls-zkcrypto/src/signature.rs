@@ -13,7 +13,9 @@ use rand::thread_rng;
 use rand_chacha::rand_core::SeedableRng;
 use sha2::Sha256;
 
-use super::{public_key::PublicKey, signature_bytes::SignatureBytes, public_key_bytes::PublicKeyBytes};
+use super::{
+    public_key::PublicKey, public_key_bytes::PublicKeyBytes, signature_bytes::SignatureBytes,
+};
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug, From)]
 pub struct Signature(G2Projective);

@@ -202,7 +202,7 @@ dependencies = [
  "rand_chacha",
  "serde",
  "serde_utils",
- "sha2",
+ "sha2 0.10.8",
  "ssz",
  "static_assertions",
  "typenum",
@@ -843,7 +843,7 @@ dependencies = [
  "ethereum-types",
  "generic-array",
  "hex-literal",
- "sha2",
+ "sha2 0.10.8",
 ]
 
 [[package]]
@@ -1189,7 +1189,7 @@ dependencies = [
  "hkdf",
  "multihash",
  "quick-protobuf",
- "sha2",
+ "sha2 0.10.9",
  "thiserror 2.0.12",
  "tracing",
 ]
@@ -1818,6 +1818,16 @@ dependencies = [
 
 [[package]]
 name = "sha2"
+version = "0.10.8"
+source = "git+https://github.com/sp1-patches/RustCrypto-hashes?tag=patch-sha2-0.10.8-sp1-4.0.0#1f224388fdede7cef649bce0d63876d1a9e3f515"
+dependencies = [
+ "cfg-if",
+ "cpufeatures",
+ "digest",
+]
+
+[[package]]
+name = "sha2"
 version = "0.10.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a7507d819769d01a365ab707794a4084392c824f54a7a6a7862f8c3d0892b283"
@@ -1901,7 +1911,7 @@ dependencies = [
  "p3-poseidon2",
  "p3-symmetric",
  "serde",
- "sha2",
+ "sha2 0.10.9",
 ]
 
 [[package]]
@@ -1915,7 +1925,7 @@ dependencies = [
  "lazy_static",
  "libm",
  "rand",
- "sha2",
+ "sha2 0.10.9",
  "sp1-lib",
  "sp1-primitives",
 ]
@@ -2744,8 +2754,3 @@ dependencies = [
  "transition_functions",
  "types",
 ]
-
-[[patch.unused]]
-name = "sha2"
-version = "0.10.8"
-source = "git+https://github.com/sp1-patches/RustCrypto-hashes?tag=patch-sha2-0.10.8-sp1-4.0.0#1f224388fdede7cef649bce0d63876d1a9e3f515"

@@ -68,11 +68,10 @@ pub fn state_transition<P: Preset, V: Verifier + Send>(
     };
 
     if let Some(verify_signatures) = verify_signatures {
-        let signature_result = verify_signatures()
-            .map_err(|_| anyhow!("failed to verify signatures"));
+        let signature_result =
+            verify_signatures().map_err(|_| anyhow!("failed to verify signatures"));
 
-        let block_result = process_block()
-            .map_err(|_| anyhow!("failed to process block"));
+        let block_result = process_block().map_err(|_| anyhow!("failed to process block"));
 
         signature_result.and(block_result)
     } else {

@@ -1,12 +1,17 @@
-use std::{path::Path, str::FromStr, time::Instant};
+use std::{io::Read, path::Path, str::FromStr, time::Instant};
 
 use anyhow::Result;
-use clap::{Parser, Subcommand};
-use transition_functions::combined::untrusted_state_transition as state_transition;
-use types::{combined::{BeaconState, SignedBeaconBlock}, config::Config, preset::Mainnet, traits::BeaconState as _};
 use backend::{Vm, VmBackend as _};
 use bls as _;
+use clap::{Parser, Subcommand};
 use ssz::{SszHash as _, SszRead as _, H256};
+use transition_functions::combined::untrusted_state_transition as state_transition;
+use types::{
+    combined::{BeaconState, SignedBeaconBlock},
+    config::Config,
+    preset::Mainnet,
+    traits::BeaconState as _,
+};
 
 use crate::backend::{ProofTrait, ReportTrait};
 
@@ -34,10 +39,16 @@ struct Args {
 #[derive(Subcommand, Debug)]
 enum Command {
     Execute,
-    Prove
+    Prove,
 }
 
 fn main() -> Result<()> {
+    // let file = std::fs::File::open(std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("e577e646-270b-409d-a76c-31aa81df8f9b.bincode"))?;
+    // let mut buf = Vec::new();
+    // file.read_to_end(&mut buf)?;
+    // let receipt: risc0_zkvm::Receipt = bincode::deserialize(&buf)?;
+    // println!("cycles: {}", receipt.);
+
     let tests = [
         Test {
             name: "pectra-devnet-6 first block",
@@ -67,7 +78,10 @@ fn main() -> Result<()> {
 
     let args = Args::parse();
 
-    let selected_test = tests.iter().find(|i| i.name.contains(&args.test)).expect("No matching test");
+    let selected_test = tests
+        .iter()
+        .find(|i| i.name.contains(&args.test))
+        .expect("No matching test");
 
     println!("Running test \"{}\"", selected_test.name);
 
@@ -75,9 +89,7 @@ fn main() -> Result<()> {
 
     let block_ssz = std::fs::read(Path::new(env!("CARGO_MANIFEST_DIR")).join(selected_test.block))?;
 
-    let state_ssz = std::fs::read(
-        Path::new(env!("CARGO_MANIFEST_DIR")).join(selected_test.state),
-    )?;
+    let state_ssz = std::fs::read(Path::new(env!("CARGO_MANIFEST_DIR")).join(selected_test.state))?;
 
     let expected_root = {
         let block = SignedBeaconBlock::<Mainnet>::from_ssz(&config, block_ssz.clone())?;
@@ -93,23 +105,30 @@ fn main() -> Result<()> {
             let vm = Vm::new()?;
             let (output_bytes, report) = vm.execute(state_ssz, block_ssz)?;
             let state = BeaconState::<Mainnet>::from_ssz(&config, output_bytes)?;
-            
+
             println!("elapsed: {:?}", started_at.elapsed());
             println!("cycles: {}", report.cycles());
 
             println!("state slot after state transition: {}", state.slot());
-            println!("state root after state transition: {:?}", state.hash_tree_root());
+            println!(
+                "state root after state transition: {:?}",
+                state.hash_tree_root()
+            );
             assert_eq!(state.slot(), selected_test.expected_slot);
             assert_eq!(state.hash_tree_root(), expected_root);
-        },
+        }
         Command::Prove => {
             let started_at = Instant::now();
             let vm = Vm::new()?;
             let (output_bytes, proof) = vm.prove(state_ssz, block_ssz)?;
             let state = BeaconState::<Mainnet>::from_ssz(&config, output_bytes)?;
             println!("elapsed: {:?}", started_at.elapsed());
+            // println!("cycles: {}", proof.cycles());
             println!("state slot after state transition: {}", state.slot());
-            println!("state root after state transition: {:?}", state.hash_tree_root());
+            println!(
+                "state root after state transition: {:?}",
+                state.hash_tree_root()
+            );
 
             proof.save(Path::new(env!("CARGO_MANIFEST_DIR")).join("proof.bin"))?;
 

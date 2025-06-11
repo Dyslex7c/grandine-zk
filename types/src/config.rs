@@ -663,7 +663,7 @@ impl Config {
             ..Self::default()
         }
     }
-    
+
     // [Mekong devnet configuration](https://github.com/ethpandaops/mekong-devnets/blob/91b6121b3e8eafc7921eaa83b33620183e57dc65/network-configs/devnet-0/metadata/config.yaml)
     #[must_use]
     pub fn mekong() -> Self {
