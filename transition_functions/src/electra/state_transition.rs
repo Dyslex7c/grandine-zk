@@ -68,13 +68,13 @@ pub fn state_transition<P: Preset, V: Verifier + Send>(
         Ok(())
     };
 
-    if let Some(verify_signatures) = verify_signatures {
-        let signature_result = verify_signatures();
-        let block_result = process_block();
-        signature_result.and(block_result)
-    } else {
-        process_block()
-    }
+    // if let Some(verify_signatures) = verify_signatures {
+    //     let signature_result = verify_signatures();
+    //     let block_result = process_block();
+    //     signature_result.and(block_result)
+    // } else {
+    process_block()
+    // }
 }
 
 #[expect(clippy::too_many_lines)]

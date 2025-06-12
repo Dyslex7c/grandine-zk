@@ -73,6 +73,14 @@ fn main() -> Result<()> {
             state: "../data/pectra-devnet-6/beacon_state_slot_00021568_root_0xb28a634b89c669141990ed5deceb1ea4777869a64cb8eaccb6cb9f4796c5110d.ssz",
 
             expected_slot: 21569,
+        },
+        Test {
+            name: "mainnet without epoch transition",
+
+            block: "../data/mainnet/beacon_block_slot_11893759_root_0x3a74cd235bf22d0d637b41b320f9162c6a7c81639b3fff28d1bceb1627fe82fb.ssz",
+            state: "../data/mainnet/beacon_state_slot_11893758_root_0x6ae5cfd675459d878fc43a4205967660abc21e8e399195da5013af6b0547420b.ssz",
+
+            expected_slot: 11893759,
         }
     ];
 

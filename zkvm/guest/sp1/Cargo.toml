@@ -11,6 +11,7 @@ ssz = { path = '../../../ssz' }
 transition_functions = { path = '../../../transition_functions' }
 types = { path = '../../../types' }
 bls = { path = '../../../bls', features = ['zkcrypto', 'zkvm'] }
+# sp1-zkvm = { path = '../../../../sp1/crates/zkvm/entrypoint', features = ['embedded'] }
 sp1-zkvm = '5.0.0'
 
 [patch.crates-io]
