@@ -19,3 +19,5 @@ pub mod verifier;
 // - <https://github.com/rust-lang/rust/issues/79381>
 #[cfg(test)]
 mod spec_tests;
+
+mod par_utils;

@@ -7,16 +7,18 @@ edition = "2021"
 
 [dependencies]
 anyhow = '1.0.93'
-risc0-zkvm = { version = "2.1.0", default-features = false, features = ['std', 'unstable'] }
-risc0-zkvm-platform = { version = "2.0.2", features = ['sys-getenv'] }
-bls = { path = '../../../../bls', features = ['zkcrypto', 'zkvm'] }
+bls = { path = '../../../../bls', features = ['zkcrypto'] }
+database = { path = '../../../../database' }
+pubkey_cache = { path = '../../../../pubkey_cache' }
+risc0-zkvm = { version = "2.1.0", default-features = false, features = ['std', 'unstable', 'heap-embedded-alloc'] }
+risc0-zkvm-platform = { version = "2.0.2", features = ['sys-getenv', 'heap-embedded-alloc'] }
 serde = { version = "1.0", features = ["derive"] }
 ssz = { path = '../../../../ssz' }
 transition_functions = { path = '../../../../transition_functions' }
 types = { path = '../../../../types' }
 
 [patch.crates-io]
-sha2 = { git = 'https://github.com/ArtiomTr/RustCrypto-hashes.git', tag = 'sha2-v0.10.9-risczero.0', features = ['compress'] }
+sha2 = { git = 'https://github.com/ArtiomTr/universal-precompiles.git', tag = 'sha2-v0.10.9-up.0' }
 
 [patch.'https://github.com/zkcrypto/bls12_381.git']
 bls12_381 = { git = "https://github.com/ArtiomTr/zkcrypto-bls12_381.git", tag = "bls12_381/main-risczero.0" }

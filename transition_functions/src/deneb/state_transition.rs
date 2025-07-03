@@ -11,6 +11,7 @@ use helper_functions::{
     verifier::{NullVerifier, Triple, Verifier, VerifierOption},
 };
 use ssz::Hc;
+use pubkey_cache::PubkeyCache;
 use std_ext::ArcExt as _;
 use types::{
     config::Config,
@@ -22,6 +23,7 @@ use super::{block_processing, slot_processing};
 use crate::{
     altair,
     unphased::{ProcessSlots, StateRootPolicy},
+    utils,
 };
 
 #[expect(clippy::too_many_arguments)]
@@ -69,12 +71,11 @@ pub fn state_transition<P: Preset, V: Verifier + Send>(
     };
 
     if let Some(verify_signatures) = verify_signatures {
-        let signature_result =
-            verify_signatures().map_err(|_| anyhow!("failed to verify signatures"));
+        let (signature_result, block_result) = utils::join(verify_signatures, process_block);
 
-        let block_result = process_block().map_err(|_| anyhow!("failed to process block"));
-
-        signature_result.and(block_result)
+        signature_result
+            .map_err(|_| anyhow!("failed to verify signatures"))
+            .and(block_result.map_err(|_| anyhow!("failed to process block")))
     } else {
         process_block()
     }

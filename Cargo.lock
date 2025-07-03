@@ -298,7 +298,7 @@ dependencies = [
  "digest 0.10.7",
  "fnv",
  "merlin",
- "sha2 0.10.8",
+ "sha2 0.10.9",
 ]
 
 [[package]]
@@ -1078,6 +1078,12 @@ checksum = "4c7f02d4ea65f2c1853089ffd8d2787bdbc63de2f0d29dedbcf8ccdfa0ccd4cf"
 
 [[package]]
 name = "base64"
+version = "0.13.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9e1b586273c5702936fe7b7d6896644d8be71e6314cfe09d3167c95f712589e8"
+
+[[package]]
+name = "base64"
 version = "0.21.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9d297deb1925b89f2ccc13d7635fa0714f12c87adce1c75356b39ca9b7178567"
@@ -1136,7 +1142,7 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_utils",
- "sha2 0.10.8",
+ "sha2 0.10.9",
  "shuffling",
  "ssz",
  "std_ext",
@@ -1416,7 +1422,7 @@ name = "bls-zkcrypto"
 version = "0.0.0"
 dependencies = [
  "bls-core",
- "bls12_381 0.8.0 (git+https://github.com/sp1-patches/bls12_381?tag=patch-0.8.0-sp1-5.0.0)",
+ "bls12_381 0.8.0 (git+https://github.com/ArtiomTr/zkcrypto-bls12_381.git?tag=bls12_381%2Fmain-risczero.0)",
  "derivative",
  "derive_more 1.0.0",
  "ff 0.13.1",
@@ -1429,7 +1435,7 @@ dependencies = [
  "rand_chacha 0.3.1",
  "serde",
  "serde_utils",
- "sha2 0.10.8",
+ "sha2 0.10.9",
  "ssz",
  "static_assertions",
  "typenum",
@@ -1452,16 +1458,15 @@ dependencies = [
 [[package]]
 name = "bls12_381"
 version = "0.8.0"
-source = "git+https://github.com/sp1-patches/bls12_381?tag=patch-0.8.0-sp1-5.0.0#8774878d42311b956022007e9960043baad24a7f"
+source = "git+https://github.com/ArtiomTr/zkcrypto-bls12_381.git?tag=bls12_381%2Fmain-risczero.0#6f38d28f9d5657d4a7330f6973fd23f793b21ef5"
 dependencies = [
- "cfg-if",
+ "bytemuck",
  "digest 0.10.7",
  "ff 0.13.1",
  "group 0.13.0",
- "hex",
  "pairing 0.23.0",
  "rand_core 0.6.4",
- "sp1-lib",
+ "risc0-bigint2",
  "subtle",
 ]
 
@@ -1976,9 +1981,15 @@ dependencies = [
  "encode_unicode",
  "libc",
  "once_cell",
- "unicode-width",
+ "unicode-width 0.2.0",
  "windows-sys 0.59.0",
 ]
+
+[[package]]
+name = "const-default"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0b396d1f76d455557e1218ec8066ae14bba60b4b36ecd55577ba979f5db7ecaa"
 
 [[package]]
 name = "const-hex"
@@ -2951,7 +2962,7 @@ dependencies = [
  "ed25519",
  "rand_core 0.6.4",
  "serde",
- "sha2 0.10.8",
+ "sha2 0.10.9",
  "subtle",
  "zeroize",
 ]
@@ -2987,7 +2998,7 @@ dependencies = [
  "serde_json",
  "serde_utils",
  "serde_with",
- "sha2 0.10.8",
+ "sha2 0.10.9",
  "tap",
  "test-case",
  "thiserror 1.0.69",
@@ -3003,7 +3014,7 @@ dependencies = [
  "duplicate 2.0.0",
  "num-traits",
  "serde",
- "sha2 0.10.8",
+ "sha2 0.10.9",
  "spec_test_utils",
  "ssz",
  "test-generator",
@@ -3042,6 +3053,18 @@ dependencies = [
  "serdect",
  "subtle",
  "zeroize",
+]
+
+[[package]]
+name = "embedded-alloc"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8f2de9133f68db0d4627ad69db767726c99ff8585272716708227008d3f1bddd"
+dependencies = [
+ "const-default",
+ "critical-section",
+ "linked_list_allocator",
+ "rlsf",
 ]
 
 [[package]]
@@ -3377,7 +3400,7 @@ dependencies = [
  "rand 0.8.5",
  "regex",
  "serde",
- "sha2 0.10.8",
+ "sha2 0.10.9",
  "slog",
  "slog-async",
  "slog-term",
@@ -4139,7 +4162,7 @@ dependencies = [
  "rand 0.8.5",
  "regex",
  "serde",
- "sha2 0.10.8",
+ "sha2 0.10.9",
  "tracing",
  "void",
  "web-time",
@@ -4342,7 +4365,7 @@ dependencies = [
  "generic-array 0.14.7",
  "hex-literal",
  "itertools 0.14.0",
- "sha2 0.10.8",
+ "sha2 0.10.9",
 ]
 
 [[package]]
@@ -5252,7 +5275,7 @@ dependencies = [
  "console",
  "number_prefix",
  "portable-atomic",
- "unicode-width",
+ "unicode-width 0.2.0",
  "web-time",
 ]
 
@@ -5485,7 +5508,7 @@ dependencies = [
  "elliptic-curve",
  "once_cell",
  "serdect",
- "sha2 0.10.8",
+ "sha2 0.10.9",
  "signature",
 ]
 
@@ -5544,7 +5567,7 @@ name = "kzg"
 version = "0.1.0"
 source = "git+https://github.com/grandinetech/rust-kzg.git#21670cd7544ebf25f4b6ae1bf99bbced6cae1967"
 dependencies = [
- "sha2 0.10.8",
+ "sha2 0.10.9",
  "siphasher",
 ]
 
@@ -5784,7 +5807,7 @@ dependencies = [
  "rand 0.8.5",
  "regex",
  "serde",
- "sha2 0.10.8",
+ "sha2 0.10.9",
  "tracing",
  "web-time",
 ]
@@ -5827,7 +5850,7 @@ dependencies = [
  "rand 0.8.5",
  "sec1",
  "serde",
- "sha2 0.10.8",
+ "sha2 0.10.9",
  "thiserror 1.0.69",
  "tracing",
  "zeroize",
@@ -5853,7 +5876,7 @@ dependencies = [
  "quick-protobuf-codec",
  "rand 0.8.5",
  "serde",
- "sha2 0.10.8",
+ "sha2 0.10.9",
  "smallvec",
  "thiserror 2.0.12",
  "tracing",
@@ -6147,6 +6170,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "linked_list_allocator"
+version = "0.10.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9afa463f5405ee81cdb9cc2baf37e08ec7e4c8209442b5d72c04cfb2cd6e6286"
+
+[[package]]
 name = "linux-raw-sys"
 version = "0.4.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6240,6 +6269,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "234cf4f4a04dc1f57e24b96cc0cd600cf2af460d4161ac5ecdd0af8e1f3b2a38"
 dependencies = [
  "hashbrown 0.15.2",
+]
+
+[[package]]
+name = "lzma-sys"
+version = "0.1.20"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5fda04ab3764e6cde78b9974eec4f779acaba7c4e84b36eca3cf77c581b85d27"
+dependencies = [
+ "cc",
+ "libc",
+ "pkg-config",
 ]
 
 [[package]]
@@ -7049,7 +7089,7 @@ dependencies = [
  "ecdsa",
  "elliptic-curve",
  "primeorder",
- "sha2 0.10.8",
+ "sha2 0.10.9",
 ]
 
 [[package]]
@@ -7359,7 +7399,7 @@ dependencies = [
  "ecdsa",
  "elliptic-curve",
  "primeorder",
- "sha2 0.10.8",
+ "sha2 0.10.9",
 ]
 
 [[package]]
@@ -8553,6 +8593,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "risc0-bigint2"
+version = "1.4.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9b9fcc9b964c17bdc953dec1e288dad5e24ce3694d5a514911c3a15294a201aa"
+dependencies = [
+ "include_bytes_aligned",
+ "stability",
+]
+
+[[package]]
 name = "risc0-binfmt"
 version = "2.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -8706,7 +8756,7 @@ dependencies = [
  "risc0-core",
  "risc0-zkvm-platform",
  "serde",
- "sha2 0.10.8",
+ "sha2 0.10.9",
  "stability",
  "tracing",
 ]
@@ -8742,7 +8792,7 @@ dependencies = [
  "rzup",
  "semver",
  "serde",
- "sha2 0.10.8",
+ "sha2 0.10.9",
  "stability",
  "tempfile",
  "tracing",
@@ -8756,6 +8806,8 @@ checksum = "2e4de2938eaf24892ef927d9cef6e4acb6a19ce01c017cd498533896f633f332"
 dependencies = [
  "bytemuck",
  "cfg-if",
+ "critical-section",
+ "embedded-alloc",
  "getrandom 0.2.15",
  "getrandom 0.3.2",
  "libm",
@@ -8770,6 +8822,18 @@ checksum = "bb919243f34364b6bd2fc10ef797edbfa75f33c252e7998527479c6d6b47e1ec"
 dependencies = [
  "bytes",
  "rustc-hex",
+]
+
+[[package]]
+name = "rlsf"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "222fb240c3286247ecdee6fa5341e7cdad0ffdf8e7e401d9937f2d58482a20bf"
+dependencies = [
+ "cfg-if",
+ "const-default",
+ "libc",
+ "svgbobdoc",
 ]
 
 [[package]]
@@ -8807,7 +8871,7 @@ dependencies = [
  "pkcs1",
  "pkcs8",
  "rand_core 0.6.4",
- "sha2 0.10.8",
+ "sha2 0.10.9",
  "signature",
  "spki",
  "subtle",
@@ -9250,7 +9314,7 @@ dependencies = [
  "password-hash",
  "pbkdf2",
  "salsa20",
- "sha2 0.10.8",
+ "sha2 0.10.9",
 ]
 
 [[package]]
@@ -9598,8 +9662,8 @@ dependencies = [
 
 [[package]]
 name = "sha2"
-version = "0.10.8"
-source = "git+https://github.com/sp1-patches/RustCrypto-hashes?tag=patch-sha2-0.10.8-sp1-4.0.0#1f224388fdede7cef649bce0d63876d1a9e3f515"
+version = "0.10.9"
+source = "git+https://github.com/ArtiomTr/universal-precompiles.git?tag=sha2-v0.10.9-up.0#bd34a0d4d68c814f060946cbb801eba1f4be3598"
 dependencies = [
  "cfg-if",
  "cpufeatures",
@@ -9886,7 +9950,7 @@ dependencies = [
  "rand_core 0.6.4",
  "ring",
  "rustc_version",
- "sha2 0.10.8",
+ "sha2 0.10.9",
  "subtle",
 ]
 
@@ -10092,17 +10156,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "sp1-lib"
-version = "5.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "03046db52868c1b60e8acffa0777ef6dc11ec1bbbb10b9eb612a871f69c8d3f6"
-dependencies = [
- "bincode",
- "serde",
- "sp1-primitives",
-]
-
-[[package]]
 name = "sp1-primitives"
 version = "5.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -10119,7 +10172,7 @@ dependencies = [
  "p3-poseidon2",
  "p3-symmetric",
  "serde",
- "sha2 0.10.8",
+ "sha2 0.10.9",
 ]
 
 [[package]]
@@ -10152,7 +10205,7 @@ dependencies = [
  "serde",
  "serde_json",
  "serial_test",
- "sha2 0.10.8",
+ "sha2 0.10.9",
  "sp1-core-executor",
  "sp1-core-machine",
  "sp1-primitives",
@@ -10295,7 +10348,7 @@ dependencies = [
  "p3-symmetric",
  "serde",
  "serde_json",
- "sha2 0.10.8",
+ "sha2 0.10.9",
  "sp1-core-machine",
  "sp1-recursion-compiler",
  "sp1-stark",
@@ -10598,6 +10651,19 @@ dependencies = [
  "hmac-sha512",
  "rand 0.8.5",
  "rsa",
+]
+
+[[package]]
+name = "svgbobdoc"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f2c04b93fc15d79b39c63218f15e3fdffaa4c227830686e3b7c5f41244eb3e50"
+dependencies = [
+ "base64 0.13.1",
+ "proc-macro2 1.0.94",
+ "quote 1.0.40",
+ "syn 1.0.109",
+ "unicode-width 0.1.14",
 ]
 
 [[package]]
@@ -11477,6 +11543,12 @@ checksum = "f6ccf251212114b54433ec949fd6a7841275f9ada20dddd2f29e9ceea4501493"
 
 [[package]]
 name = "unicode-width"
+version = "0.1.14"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7dd6e30e90baa6f72411720665d41d89b9a3d039dc45b8faea1ddd07f617f6af"
+
+[[package]]
+name = "unicode-width"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1fc81956842c57dac11422a97c3b8195a1ff727f06e85c84ed2e8aa277c9a0fd"
@@ -11652,7 +11724,7 @@ dependencies = [
  "fs-err",
  "log",
  "serde_json",
- "sha2 0.10.8",
+ "sha2 0.10.9",
  "ssz",
  "tap",
  "try_from_iterator",
@@ -12534,6 +12606,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "xz2"
+version = "0.1.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "388c44dc09d76f1536602ead6d325eb532f5c122f17782bd57fb47baeeb767e2"
+dependencies = [
+ "lzma-sys",
+]
+
+[[package]]
 name = "yaml-rust2"
 version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -12740,7 +12821,7 @@ dependencies = [
  "pasta_curves 0.5.1",
  "rand 0.8.5",
  "serde",
- "sha2 0.10.8",
+ "sha2 0.10.9",
  "sha3",
  "subtle",
 ]
@@ -12757,21 +12838,19 @@ name = "zkvm_host"
 version = "0.0.0"
 dependencies = [
  "anyhow",
- "bincode",
  "bls",
- "bonsai-sdk",
  "borsh",
- "bytemuck",
  "clap",
- "hex",
- "regex",
+ "database",
+ "pubkey_cache",
+ "reqwest",
  "risc0-zkvm",
- "serde",
  "sp1-helper",
  "sp1-sdk",
  "ssz",
  "tracing-subscriber 0.3.19",
  "transition_functions",
  "types",
+ "xz2",
  "zkvm_guest_risc0",
 ]

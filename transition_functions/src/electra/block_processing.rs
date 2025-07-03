@@ -5,6 +5,7 @@ use arithmetic::U64Ext as _;
 use bit_field::BitField as _;
 use bls::PublicKeyBytes;
 use execution_engine::{ExecutionEngine, NullExecutionEngine};
+use pubkey_cache::PubkeyCache;
 use helper_functions::{
     accessors::{
         self, attestation_epoch, get_attestation_participation_flags, get_base_reward,

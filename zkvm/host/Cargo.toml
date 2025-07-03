@@ -8,21 +8,19 @@ workspace = true
 
 [dependencies]
 anyhow = { workspace = true }
-bincode = { workspace = true }
-bls = { workspace = true, features = ['zkcrypto', 'zkvm'] }
-bonsai-sdk = { workspace = true }
-borsh = { workspace = true }
-bytemuck = { workspace = true, optional = true }
+bls = { workspace = true, features = ['zkcrypto'] }
+borsh = { workspace = true, optional = true }
 clap = { workspace = true, features = ['derive'] }
-hex = { workspace = true }
-serde = { workspace = true, features = ['derive'], optional = true }
+database = { workspace = true }
+pubkey_cache = { workspace = true }
+reqwest = { workspace = true }
+risc0-zkvm = { workspace = true, optional = true, features = ['unstable', 'heap-embedded-alloc'] }
+sp1-sdk = { workspace = true, optional = true }
 ssz = { workspace = true }
 tracing-subscriber = { workspace = true, optional = true }
-regex = { workspace = true }
-risc0-zkvm = { workspace = true, optional = true }
-sp1-sdk = { workspace = true, optional = true }
 transition_functions = { workspace = true }
 types = { workspace = true }
+xz2 = { workspace = true }
 zkvm_guest_risc0 = { workspace = true, optional = true }
 
 [build-dependencies]
@@ -30,11 +28,10 @@ sp1-helper = { workspace = true, optional = true }
 
 [features]
 risc0 = [
+    "dep:borsh",
     "dep:risc0-zkvm",
     "dep:tracing-subscriber",
     "dep:zkvm_guest_risc0",
-    "dep:serde",
-    "dep:bytemuck",
 ]
 sp1 = [
     "dep:sp1-helper",

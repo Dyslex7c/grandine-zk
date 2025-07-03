@@ -18,6 +18,7 @@ use helper_functions::{
     verifier::{MultiVerifier, SingleVerifier, Triple, Verifier, VerifierOption},
 };
 use itertools::Itertools as _;
+use pubkey_cache::PubkeyCache;
 use ssz::SszHash as _;
 use typenum::Unsigned as _;
 use types::{
@@ -470,7 +471,7 @@ pub fn validate_deposits<P: Preset>(
 
     let mut combined_deposits = deposits_by_pubkey
         .into_iter()
-        .map(|(existing_validator_index, cached_public_key, deposits)| {
+        .map(|(existing_validator_index, pubkey, deposits)| {
             for (position, deposit) in deposits.iter().copied() {
                 // > Verify the Merkle branch
                 verify_deposit_merkle_branch(

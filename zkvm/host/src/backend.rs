@@ -28,21 +28,11 @@ mod risc0 {
     use super::{ProofTrait, ReportTrait, VmBackend};
     use anyhow::Result;
     use borsh::BorshSerialize;
-    use bonsai_sdk::blocking::Client;
-    use risc0_zkvm::{
-        compute_image_id, default_prover, serde::to_vec, ExecutorEnv, Receipt, SessionStats,
-    };
-    use serde::Serialize;
-    use std::{fs::File, io::BufWriter, time::Duration};
+    use risc0_zkvm::{default_prover, ExecutorEnv, Receipt, SessionStats};
+    use std::{fs::File, io::BufWriter};
     use zkvm_guest_risc0::{
         RISC0_GRANDINE_STATE_TRANSITION_ELF, RISC0_GRANDINE_STATE_TRANSITION_ID,
     };
-
-    #[derive(Serialize)]
-    struct Input {
-        block_ssz: Vec<u8>,
-        state_ssz: Vec<u8>,
-    }
 
     pub struct Vm;
 
@@ -89,7 +79,10 @@ mod risc0 {
             let prover = default_prover();
 
             let env = ExecutorEnv::builder()
-                .write(&Input { block_ssz, state_ssz })?
+                .write(&state_ssz.len())?
+                .write(&block_ssz.len())?
+                .write_slice(&state_ssz)
+                .write_slice(&block_ssz)
                 .build()?;
 
             let elf = RISC0_GRANDINE_STATE_TRANSITION_ELF;
@@ -101,74 +94,21 @@ mod risc0 {
         }
 
         fn prove(&self, state_ssz: Vec<u8>, block_ssz: Vec<u8>) -> Result<(Vec<u8>, Self::Proof)> {
-            let client = Client::from_env(risc0_zkvm::VERSION)?;
+            let prover = default_prover();
 
-            let image_id = hex::encode(compute_image_id(RISC0_GRANDINE_STATE_TRANSITION_ELF)?);
-            client.upload_img(&image_id, RISC0_GRANDINE_STATE_TRANSITION_ELF.to_vec())?;
+            let env = ExecutorEnv::builder()
+                .write(&state_ssz.len())?
+                .write(&block_ssz.len())?
+                .write_slice(&state_ssz)
+                .write_slice(&block_ssz)
+                .build()?;
 
-            let input_data = to_vec(&Input {
-                block_ssz,
-                state_ssz,
-            })?;
-            let input_data = bytemuck::cast_slice(&input_data).to_vec();
-            println!("{}", input_data.len());
-            let input_id = client.upload_input(input_data)?;
+            let elf = RISC0_GRANDINE_STATE_TRANSITION_ELF;
 
-            let assumptions: Vec<String> = vec![];
+            let prove_info = prover.prove(env, elf)?;
+            let receipt = prove_info.receipt;
 
-            let execute_only = false;
-
-            eprintln!("starting {} {}", image_id, input_id);
-            let session = client.create_session(image_id, input_id, assumptions, execute_only)?;
-
-            loop {
-                let res = session.status(&client)?;
-                if res.status == "RUNNING" {
-                    eprintln!(
-                        "Current status: {} - state: {} - continue polling...",
-                        res.status,
-                        res.state.unwrap_or_default()
-                    );
-                    std::thread::sleep(Duration::from_secs(15));
-                    continue;
-                }
-
-                if res.status == "SUCCEEDED" {
-                    // Download the receipt, containing the output
-                    let receipt_url = res
-                        .receipt_url
-                        .expect("API error, missing receipt on completed session");
-
-                    eprintln!("receipt url: {}", receipt_url);
-                    let receipt_buf = client.download(&receipt_url)?;
-                    let receipt: Receipt = bincode::deserialize(&receipt_buf)?;
-
-                    
-
-                    break Ok((receipt.journal.bytes.clone(), Proof(receipt)));
-                } else {
-                    break Err(anyhow::anyhow!(
-                        "Workflow exited: {} - | err: {}",
-                        res.status,
-                        res.error_msg.unwrap_or_default()
-                    ));
-                }
-            }
-            // let prover = default_prover();
-
-            // let env = ExecutorEnv::builder()
-            //     .write(&state_ssz.len())?
-            //     .write(&block_ssz.len())?
-            //     .write_slice(&state_ssz)
-            //     .write_slice(&block_ssz)
-            //     .build()?;
-
-            // let elf = RISC0_GRANDINE_STATE_TRANSITION_ELF;
-
-            // let prove_info = prover.prove(env, elf)?;
-            // let receipt = prove_info.receipt;
-            
-            // Ok((receipt.journal.bytes.clone(), Proof(receipt)))
+            Ok((receipt.journal.bytes.clone(), Proof(receipt)))
         }
     }
 }
@@ -181,8 +121,8 @@ mod sp1 {
     use super::{ProofTrait, ReportTrait, VmBackend};
     use anyhow::Result;
     use sp1_sdk::{
-        include_elf, EnvProver, NetworkProver, ExecutionReport, ProverClient, SP1ProofWithPublicValues, SP1Stdin,
-        SP1VerifyingKey, Prover,
+        include_elf, ExecutionReport, Prover, ProverClient, SP1ProofWithPublicValues, SP1Stdin,
+        SP1VerifyingKey,
     };
     use std::path::Path;
 
@@ -249,12 +189,14 @@ mod sp1 {
             stdin.write_slice(&state_ssz);
             stdin.write_slice(&block_ssz);
 
-            let proof = client.prove(&pk, &stdin).skip_simulation(true).cycle_limit(10_000_000_000).groth16().run()?;
+            let proof = client
+                .prove(&pk, &stdin)
+                .skip_simulation(true)
+                .cycle_limit(10_000_000_000)
+                .groth16()
+                .run()?;
 
-            Ok((
-                proof.public_values.as_slice().to_vec(),
-                Proof(vk, proof),
-            ))
+            Ok((proof.public_values.as_slice().to_vec(), Proof(vk, proof)))
         }
     }
 }

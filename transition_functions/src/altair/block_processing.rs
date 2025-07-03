@@ -16,6 +16,7 @@ use helper_functions::{
     slot_report::{Delta, NullSlotReport, SlotReport, SyncAggregateRewards},
     verifier::{SingleVerifier, Triple, Verifier},
 };
+use pubkey_cache::PubkeyCache;
 use std_ext::ArcExt as _;
 use typenum::Unsigned as _;
 use types::{

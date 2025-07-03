@@ -1,10 +1,17 @@
-use std::{io::Read, path::Path, str::FromStr, time::Instant};
+use std::{
+    fs::File,
+    io::{ErrorKind, Read, Write},
+    path::Path,
+    time::Instant,
+};
+use xz2::write::XzDecoder;
 
 use anyhow::Result;
 use backend::{Vm, VmBackend as _};
 use bls as _;
 use clap::{Parser, Subcommand};
-use ssz::{SszHash as _, SszRead as _, H256};
+use reqwest::IntoUrl;
+use ssz::{SszHash as _, SszRead as _};
 use transition_functions::combined::untrusted_state_transition as state_transition;
 use types::{
     combined::{BeaconState, SignedBeaconBlock},
@@ -12,6 +19,8 @@ use types::{
     preset::Mainnet,
     traits::BeaconState as _,
 };
+use pubkey_cache::PubkeyCache;
+use database::Database;
 
 use crate::backend::{ProofTrait, ReportTrait};
 
@@ -22,7 +31,9 @@ struct Test {
     name: &'static str,
 
     block: &'static str,
+    block_url: &'static str,
     state: &'static str,
+    state_url: &'static str,
 
     expected_slot: u64,
 }
@@ -42,27 +53,43 @@ enum Command {
     Prove,
 }
 
+fn get_or_download(path: impl AsRef<Path>, url: impl IntoUrl) -> Result<Vec<u8>> {
+    let path = path.as_ref();
+
+    File::open(path)
+        .and_then(|mut f| {
+            let mut buf = Vec::new();
+            f.read_to_end(&mut buf)?;
+            Ok(buf)
+        })
+        .or_else(move |err| {
+            if err.kind() != ErrorKind::NotFound {
+                return Err(anyhow::anyhow!(err));
+            }
+
+            let mut response = reqwest::blocking::Client::new()
+                .get(url)
+                .send()?
+                .error_for_status()?;
+            let mut file = File::create(path)?;
+            let mut decoder = XzDecoder::new(Vec::new());
+            response.copy_to(&mut decoder)?;
+            let buf = decoder.finish()?;
+
+            file.write_all(&buf)?;
+            Ok(buf)
+        })
+}
+
 fn main() -> Result<()> {
-    // let file = std::fs::File::open(std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("e577e646-270b-409d-a76c-31aa81df8f9b.bincode"))?;
-    // let mut buf = Vec::new();
-    // file.read_to_end(&mut buf)?;
-    // let receipt: risc0_zkvm::Receipt = bincode::deserialize(&buf)?;
-    // println!("cycles: {}", receipt.);
-
     let tests = [
-        Test {
-            name: "pectra-devnet-6 first block",
-
-            block: "../data/pectra-devnet-6/beacon_block_slot_00000001_root_0x58602aaed9e485527f8fdaafef2000398a722d091eb6619c28c669acc69547ef.ssz",
-            state: "../data/pectra-devnet-6/genesis.ssz",
-
-            expected_slot: 1,
-        },
         Test {
             name: "pectra-devnet-6 with epoch transition",
 
             block: "../data/pectra-devnet-6/beacon_block_slot_00021568_root_0xb28a634b89c669141990ed5deceb1ea4777869a64cb8eaccb6cb9f4796c5110d.ssz",
+            block_url: "https://assets.grandine.io/beacon_block_slot_00021568_root_0xb28a634b89c669141990ed5deceb1.xz",
             state: "../data/pectra-devnet-6/beacon_state_slot_00021567_root_0xd51b605669c3e1ec96d83b6ab191d921f276d363621009fa6fd4a171a6bbf943.ssz",
+            state_url: "https://assets.grandine.io/beacon_state_slot_00021567_root_0xd51b605669c3e1ec96d83b6ab191d.xz",
 
             expected_slot: 21568,
         },
@@ -70,7 +97,9 @@ fn main() -> Result<()> {
             name: "pectra-devnet-6 without epoch transition",
 
             block: "../data/pectra-devnet-6/beacon_block_slot_00021569_root_0x91008e253d2dafd1c9cd6a8ccae68a3d3010a85697ba588ef0be3dcb9b93332d.ssz",
+            block_url: "https://assets.grandine.io/beacon_block_slot_00021569_root_0x91008e253d2dafd1c9cd6a8ccae68.xz",
             state: "../data/pectra-devnet-6/beacon_state_slot_00021568_root_0xb28a634b89c669141990ed5deceb1ea4777869a64cb8eaccb6cb9f4796c5110d.ssz",
+            state_url: "https://assets.grandine.io/beacon_state_slot_00021568_root_0xb28a634b89c669141990ed5deceb1.xz",
 
             expected_slot: 21569,
         },
@@ -78,7 +107,9 @@ fn main() -> Result<()> {
             name: "mainnet without epoch transition",
 
             block: "../data/mainnet/beacon_block_slot_11893759_root_0x3a74cd235bf22d0d637b41b320f9162c6a7c81639b3fff28d1bceb1627fe82fb.ssz",
+            block_url: "https://assets.grandine.io/beacon_block_slot_11893759_root_0x3a74cd235bf22d0d637b41b320f91.xz",
             state: "../data/mainnet/beacon_state_slot_11893758_root_0x6ae5cfd675459d878fc43a4205967660abc21e8e399195da5013af6b0547420b.ssz",
+            state_url: "https://assets.grandine.io/beacon_state_slot_11893758_root_0x6ae5cfd675459d878fc43a4205967.xz",
 
             expected_slot: 11893759,
         }
@@ -95,15 +126,21 @@ fn main() -> Result<()> {
 
     let config = Config::pectra_devnet_6();
 
-    let block_ssz = std::fs::read(Path::new(env!("CARGO_MANIFEST_DIR")).join(selected_test.block))?;
-
-    let state_ssz = std::fs::read(Path::new(env!("CARGO_MANIFEST_DIR")).join(selected_test.state))?;
+    let block_ssz = get_or_download(
+        Path::new(env!("CARGO_MANIFEST_DIR")).join(selected_test.block),
+        selected_test.block_url,
+    )?;
+    let state_ssz = get_or_download(
+        Path::new(env!("CARGO_MANIFEST_DIR")).join(selected_test.state),
+        selected_test.state_url,
+    )?;
 
     let expected_root = {
         let block = SignedBeaconBlock::<Mainnet>::from_ssz(&config, block_ssz.clone())?;
         let mut state = BeaconState::<Mainnet>::from_ssz(&config, state_ssz.clone())?;
+        let cache = PubkeyCache::load(Database::in_memory());
 
-        state_transition(&config, &mut state, &block)?;
+        state_transition(&config, &cache, &mut state, &block)?;
         state.hash_tree_root()
     };
 

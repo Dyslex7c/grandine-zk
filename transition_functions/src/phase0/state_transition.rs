@@ -11,6 +11,7 @@ use helper_functions::{
 };
 use ssz::Hc;
 use std_ext::ArcExt as _;
+use pubkey_cache::PubkeyCache;
 use types::{
     config::Config,
     phase0::{beacon_state::BeaconState, containers::SignedBeaconBlock},

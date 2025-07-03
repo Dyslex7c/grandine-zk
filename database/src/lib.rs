@@ -1,17 +1,22 @@
 use core::ops::{Range, RangeFrom, RangeToInclusive};
 use std::{
     borrow::Cow,
-    path::Path,
     sync::{Arc, Mutex},
 };
+#[cfg(not(target_os = "zkvm"))]
+use std::path::Path;
 
 use anyhow::Result;
 use bytesize::ByteSize;
+#[cfg(not(target_os = "zkvm"))]
 use futures::channel::mpsc::UnboundedSender;
 use im::OrdMap;
 use itertools::Either;
+#[cfg(not(target_os = "zkvm"))]
 use libmdbx::{DatabaseFlags, Environment, Geometry, ObjectLength, Stat, WriteFlags};
-use log::{debug, error};
+use log::error;
+#[cfg(not(target_os = "zkvm"))]
+use log::debug;
 use snap::raw::{Decoder, Encoder};
 use std_ext::ArcExt as _;
 use tap::Pipe as _;
@@ -30,11 +35,13 @@ pub trait PrefixableKey {
     }
 }
 
+#[cfg(not(target_os = "zkvm"))]
 #[derive(Debug)]
 pub enum RestartMessage {
     StorageMapFull(libmdbx::Error),
 }
 
+#[cfg(not(target_os = "zkvm"))]
 impl RestartMessage {
     pub fn send(self, tx: &UnboundedSender<Self>) {
         if let Err(message) = tx.unbounded_send(self) {
@@ -81,6 +88,7 @@ impl DatabaseMode {
 pub struct Database(DatabaseKind);
 
 impl Database {
+    #[cfg(not(target_os = "zkvm"))]
     pub fn persistent(
         name: &str,
         directory: impl AsRef<Path>,
@@ -143,6 +151,7 @@ impl Database {
 
     pub fn delete(&self, key: impl AsRef<[u8]>) -> Result<()> {
         match self.kind() {
+            #[cfg(not(target_os = "zkvm"))]
             DatabaseKind::Persistent {
                 database_name,
                 environment,
@@ -173,6 +182,7 @@ impl Database {
         let end = range.end.as_ref();
 
         match self.kind() {
+            #[cfg(not(target_os = "zkvm"))]
             DatabaseKind::Persistent {
                 database_name,
                 environment,
@@ -225,6 +235,7 @@ impl Database {
 
     pub fn contains_key(&self, key: impl AsRef<[u8]>) -> Result<bool> {
         let contains_key = match self.kind() {
+            #[cfg(not(target_os = "zkvm"))]
             DatabaseKind::Persistent {
                 database_name,
                 environment,
@@ -247,6 +258,7 @@ impl Database {
 
     pub fn get(&self, key: impl AsRef<[u8]>) -> Result<Option<Vec<u8>>> {
         match self.kind() {
+            #[cfg(not(target_os = "zkvm"))]
             DatabaseKind::Persistent {
                 database_name,
                 environment,
@@ -268,8 +280,10 @@ impl Database {
         .transpose()
     }
 
+    #[cfg(not(target_os = "zkvm"))]
     pub fn db_stats(&self) -> Result<Option<Stat>> {
         match self.kind() {
+            #[cfg(not(target_os = "zkvm"))]
             DatabaseKind::Persistent {
                 database_name,
                 environment,
@@ -289,6 +303,7 @@ impl Database {
         &self,
     ) -> Result<impl Iterator<Item = Result<(Cow<[u8]>, usize)>>> {
         match self.kind() {
+            #[cfg(not(target_os = "zkvm"))]
             DatabaseKind::Persistent {
                 database_name,
                 environment,
@@ -309,10 +324,20 @@ impl Database {
             DatabaseKind::InMemory { map } => {
                 let map = map.lock().expect("in-memory database mutex is poisoned");
 
+                let it =
                 map.clone()
                     .into_iter()
-                    .map(|(key, value)| Ok((Cow::Owned(key.to_vec()), value.len())))
-                    .pipe(Either::Right)
+                    .map(|(key, value)| Ok((Cow::Owned(key.to_vec()), value.len())));
+
+                #[cfg(not(target_os = "zkvm"))]
+                {
+                    it.pipe(Either::Right)
+                }
+                
+                #[cfg(target_os = "zkvm")]
+                {
+                    it
+                }
             }
         }
         .pipe(Ok)
@@ -326,6 +351,7 @@ impl Database {
         let start = range.start.as_ref();
 
         match self.kind() {
+            #[cfg(not(target_os = "zkvm"))]
             DatabaseKind::Persistent {
                 database_name,
                 environment,
@@ -355,10 +381,20 @@ impl Database {
                         .expect_none("start_pair should have been discarded by OrdMap::split");
                 }
 
-                above
+                let it = above
                     .into_iter()
-                    .map(|(key, value)| Ok((Cow::Owned(key.to_vec()), decompress(value.as_ref())?)))
-                    .pipe(Either::Right)
+                    .map(|(key, value)| Ok((Cow::Owned(key.to_vec()), decompress(value.as_ref())?)));
+
+                
+                #[cfg(not(target_os = "zkvm"))]
+                {
+                    it.pipe(Either::Right)
+                }
+                
+                #[cfg(target_os = "zkvm")]
+                {
+                    it
+                }
             }
         }
         .pipe(Ok)
@@ -372,6 +408,7 @@ impl Database {
         let end = range.end.as_ref();
 
         match self.kind() {
+            #[cfg(not(target_os = "zkvm"))]
             DatabaseKind::Persistent {
                 database_name,
                 environment,
@@ -401,11 +438,21 @@ impl Database {
                         .expect_none("end_pair should have been discarded by OrdMap::split");
                 }
 
+                let it = 
                 below
                     .into_iter()
                     .rev()
-                    .map(|(key, value)| Ok((Cow::Owned(key.to_vec()), decompress(value.as_ref())?)))
-                    .pipe(Either::Right)
+                    .map(|(key, value)| Ok((Cow::Owned(key.to_vec()), decompress(value.as_ref())?)));
+
+                #[cfg(not(target_os = "zkvm"))]
+                {
+                    it.pipe(Either::Right)
+                }
+                
+                #[cfg(target_os = "zkvm")]
+                {
+                    it
+                }
             }
         }
         .pipe(Ok)
@@ -420,6 +467,7 @@ impl Database {
         pairs: impl IntoIterator<Item = (impl AsRef<[u8]>, impl AsRef<[u8]>)>,
     ) -> Result<()> {
         match self.kind() {
+            #[cfg(not(target_os = "zkvm"))]
             DatabaseKind::Persistent {
                 database_name,
                 environment,
@@ -466,6 +514,7 @@ impl Database {
     /// [`im::OrdMap::get_prev`]: https://docs.rs/im/15.1.0/im/ordmap/struct.OrdMap.html#method.get_prev
     pub fn prev(&self, key: impl AsRef<[u8]>) -> Result<Option<(Vec<u8>, Vec<u8>)>> {
         match self.kind() {
+            #[cfg(not(target_os = "zkvm"))]
             DatabaseKind::Persistent {
                 database_name,
                 environment,
@@ -499,6 +548,7 @@ impl Database {
     /// [`im::OrdMap::get_next`]: https://docs.rs/im/15.1.0/im/ordmap/struct.OrdMap.html#method.get_next
     pub fn next(&self, key: impl AsRef<[u8]>) -> Result<Option<(Vec<u8>, Vec<u8>)>> {
         match self.kind() {
+            #[cfg(not(target_os = "zkvm"))]
             DatabaseKind::Persistent {
                 database_name,
                 environment,
@@ -526,6 +576,7 @@ impl Database {
 }
 
 enum DatabaseKind {
+    #[cfg(not(target_os = "zkvm"))]
     Persistent {
         // TODO(Grandine Team): It should be possible to remove `database_name` by using the default
         //                      database (`None`), but that would probably force users to resync.
@@ -574,6 +625,7 @@ fn decompress_pair<K>((key, compressed_value): (K, Cow<[u8]>)) -> Result<(K, Vec
     Ok((key, value))
 }
 
+#[cfg(not(target_os = "zkvm"))]
 fn handle_write_error(
     database_name: &str,
     error: libmdbx::Error,

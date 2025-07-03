@@ -13,6 +13,7 @@ use helper_functions::{
     verifier::{SingleVerifier, Triple, Verifier},
 };
 use typenum::Unsigned as _;
+use pubkey_cache::PubkeyCache;
 use types::{
     config::Config,
     nonstandard::{smallvec, AttestationEpoch, SlashingKind},

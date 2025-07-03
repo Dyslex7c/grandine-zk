@@ -1,31 +1,25 @@
 use risc0_zkvm::guest::env;
 
 use anyhow::Result;
-use serde::Deserialize;
 use ssz::{SszRead as _, SszWrite as _};
 use transition_functions::combined::untrusted_state_transition as state_transition;
+use pubkey_cache::PubkeyCache;
+use database::Database;
 use types::{
     combined::{BeaconState, SignedBeaconBlock},
     config::Config,
     preset::{Mainnet, Preset},
 };
 
-#[derive(Deserialize)]
-struct Input {
-    block_ssz: Vec<u8>,
-    state_ssz: Vec<u8>,
-}
-
 fn read_block_and_state<P: Preset>(config: &Config) -> Result<(SignedBeaconBlock<P>, BeaconState<P>)> {
-    let Input { block_ssz, state_ssz } = env::read();
-    // let state_ssz_len: usize = env::read();
-    // let block_ssz_len: usize = env::read();
+    let state_ssz_len: usize = env::read();
+    let block_ssz_len: usize = env::read();
 
-    // let mut block_ssz = vec![0_u8; block_ssz_len];
-    // let mut state_ssz = vec![0_u8; state_ssz_len];
+    let mut block_ssz = vec![0_u8; block_ssz_len];
+    let mut state_ssz = vec![0_u8; state_ssz_len];
 
-    // env::read_slice(&mut state_ssz);
-    // env::read_slice(&mut block_ssz);
+    env::read_slice(&mut state_ssz);
+    env::read_slice(&mut block_ssz);
 
     let block = SignedBeaconBlock::<P>::from_ssz(config, &block_ssz)?;
     let state = BeaconState::<P>::from_ssz(config, &state_ssz)?;
@@ -49,7 +43,9 @@ fn main() -> Result<()> {
 
     let start = env::cycle_count();
 
-    state_transition(&config, &mut state, &block)?;
+    let cache = PubkeyCache::load(Database::in_memory());
+
+    state_transition(&config, &cache, &mut state, &block)?;
 
     eprintln!("state transition: {}", env::cycle_count() - start);
 

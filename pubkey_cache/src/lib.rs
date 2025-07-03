@@ -5,6 +5,7 @@ use bls::{traits::PublicKey as _, PublicKey, PublicKeyBytes, COMPRESSED_SIZE, DE
 use dashmap::{DashMap, DashSet};
 use database::{Database, PrefixableKey};
 use log::{debug, info, warn};
+#[cfg(not(target_os = "zkvm"))]
 use prometheus_metrics::Metrics;
 use std_ext::ArcExt;
 use types::{combined::BeaconState, preset::Preset, traits::BeaconState as _};
@@ -109,6 +110,7 @@ impl PubkeyCache {
         Ok(pubkey)
     }
 
+    #[cfg(not(target_os = "zkvm"))]
     pub fn track_collection_metrics(&self, metrics: &Arc<Metrics>) {
         let type_name = tynm::type_name::<Self>();
 

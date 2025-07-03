@@ -11,6 +11,9 @@ use enumset::{EnumSet, EnumSetType};
 use static_assertions::assert_not_impl_any;
 use tap::TryConv as _;
 use types::phase0::primitives::H256;
+#[cfg(not(target_os = "zkvm"))]
+use rayon::iter::{IntoParallelRefIterator as _, ParallelBridge as _, ParallelIterator as _};
+use crate::par_iter;
 
 use crate::error::{Error, SignatureKind};
 
@@ -305,9 +308,7 @@ impl Verifier for MultiVerifier {
 
         let messages = self.triples.iter().map(|triple| triple.message.as_bytes());
 
-        let signatures = self
-            .triples
-            .iter()
+        let signatures = par_iter!(self.triples)
             .map(|triple| triple.signature_bytes.try_into())
             .collect::<Result<Vec<_>, _>>()?;
 
@@ -392,6 +393,7 @@ impl Verifier for Triple {
     ) -> Result<()> {
         // TODO(Grandine Team): This may no longer be true as of Rayon 1.6.1. Benchmark again.
         // The `ParallelBridge::par_bridge` here outperforms "native" parallel iterators.
+        #[cfg(not(target_os = "zkvm"))]
         let public_key = public_keys
             .into_iter()
             .par_bridge()
@@ -401,9 +403,8 @@ impl Verifier for Triple {
         #[cfg(target_os = "zkvm")]
         let public_key = public_keys
             .into_iter()
-            .copied()
             .fold(AggregatePublicKey::default(), |acc, pubkey| {
-                acc.aggregate(pubkey)
+                acc.aggregate(&pubkey)
             });
 
         *self = Self::new(message, signature_bytes, Arc::new(public_key));

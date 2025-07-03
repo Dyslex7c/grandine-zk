@@ -14,6 +14,7 @@ use helper_functions::{
 };
 use ssz::SszHash as _;
 use typenum::Unsigned as _;
+use pubkey_cache::PubkeyCache;
 use types::{
     combined::ExecutionPayloadParams,
     config::Config,

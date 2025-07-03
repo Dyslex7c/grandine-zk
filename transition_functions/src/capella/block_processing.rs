@@ -14,6 +14,7 @@ use helper_functions::{
 };
 use itertools::izip;
 use ssz::SszHash as _;
+use pubkey_cache::PubkeyCache;
 use tap::Pipe as _;
 use typenum::{NonZero, Unsigned as _};
 use types::{
