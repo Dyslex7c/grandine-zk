@@ -10,8 +10,8 @@ use helper_functions::{
     slot_report::SlotReport,
     verifier::{NullVerifier, Triple, Verifier, VerifierOption},
 };
-use ssz::Hc;
 use pubkey_cache::PubkeyCache;
+use ssz::Hc;
 use std_ext::ArcExt as _;
 use types::{
     config::Config,

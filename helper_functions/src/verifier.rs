@@ -1,6 +1,7 @@
 #![expect(clippy::module_name_repetitions)]
 use std::sync::Arc;
 
+use crate::par_iter;
 use anyhow::{ensure, Result};
 use bls::{
     traits::{PublicKey as _, Signature as _, SignatureBytes as _},
@@ -8,12 +9,11 @@ use bls::{
 };
 use derive_more::Constructor;
 use enumset::{EnumSet, EnumSetType};
+#[cfg(not(target_os = "zkvm"))]
+use rayon::iter::{IntoParallelRefIterator as _, ParallelBridge as _, ParallelIterator as _};
 use static_assertions::assert_not_impl_any;
 use tap::TryConv as _;
 use types::phase0::primitives::H256;
-#[cfg(not(target_os = "zkvm"))]
-use rayon::iter::{IntoParallelRefIterator as _, ParallelBridge as _, ParallelIterator as _};
-use crate::par_iter;
 
 use crate::error::{Error, SignatureKind};
 

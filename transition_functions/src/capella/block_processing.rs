@@ -13,8 +13,8 @@ use helper_functions::{
     verifier::{SingleVerifier, Triple, Verifier},
 };
 use itertools::izip;
-use ssz::SszHash as _;
 use pubkey_cache::PubkeyCache;
+use ssz::SszHash as _;
 use tap::Pipe as _;
 use typenum::{NonZero, Unsigned as _};
 use types::{

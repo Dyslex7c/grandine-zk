@@ -1422,7 +1422,7 @@ name = "bls-zkcrypto"
 version = "0.0.0"
 dependencies = [
  "bls-core",
- "bls12_381 0.8.0 (git+https://github.com/ArtiomTr/zkcrypto-bls12_381.git?tag=bls12_381%2Fmain-risczero.0)",
+ "bls12_381 0.8.0 (git+https://github.com/sp1-patches/bls12_381?tag=patch-0.8.0-sp1-5.0.0)",
  "derivative",
  "derive_more 1.0.0",
  "ff 0.13.1",
@@ -1458,15 +1458,16 @@ dependencies = [
 [[package]]
 name = "bls12_381"
 version = "0.8.0"
-source = "git+https://github.com/ArtiomTr/zkcrypto-bls12_381.git?tag=bls12_381%2Fmain-risczero.0#6f38d28f9d5657d4a7330f6973fd23f793b21ef5"
+source = "git+https://github.com/sp1-patches/bls12_381?tag=patch-0.8.0-sp1-5.0.0#8774878d42311b956022007e9960043baad24a7f"
 dependencies = [
- "bytemuck",
+ "cfg-if",
  "digest 0.10.7",
  "ff 0.13.1",
  "group 0.13.0",
+ "hex",
  "pairing 0.23.0",
  "rand_core 0.6.4",
- "risc0-bigint2",
+ "sp1-lib",
  "subtle",
 ]
 
@@ -8075,9 +8076,11 @@ dependencies = [
  "hex-literal",
  "log",
  "prometheus_metrics",
+ "ssz",
  "std_ext",
  "tempfile",
  "tynm",
+ "typenum",
  "types",
 ]
 
@@ -8590,16 +8593,6 @@ dependencies = [
  "libc",
  "untrusted",
  "windows-sys 0.52.0",
-]
-
-[[package]]
-name = "risc0-bigint2"
-version = "1.4.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9b9fcc9b964c17bdc953dec1e288dad5e24ce3694d5a514911c3a15294a201aa"
-dependencies = [
- "include_bytes_aligned",
- "stability",
 ]
 
 [[package]]
@@ -10153,6 +10146,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7d9a0c734756a21813ddc586238e463b0f7f18453b443c0a8028dc33a58646da"
 dependencies = [
  "sp1-build",
+]
+
+[[package]]
+name = "sp1-lib"
+version = "5.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "03046db52868c1b60e8acffa0777ef6dc11ec1bbbb10b9eb612a871f69c8d3f6"
+dependencies = [
+ "bincode",
+ "serde",
+ "sp1-primitives",
 ]
 
 [[package]]

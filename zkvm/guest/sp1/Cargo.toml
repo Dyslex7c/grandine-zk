@@ -7,11 +7,12 @@ authors = ["Grandine <info@grandine.io>"]
 
 [dependencies]
 anyhow = '1'
+bls = { path = '../../../bls', features = ['zkcrypto'] }
+pubkey_cache = { path = '../../../pubkey_cache' }
+sp1-zkvm = '5.0.0'
 ssz = { path = '../../../ssz' }
 transition_functions = { path = '../../../transition_functions' }
 types = { path = '../../../types' }
-bls = { path = '../../../bls', features = ['zkcrypto'] }
-sp1-zkvm = '5.0.0'
 
 [patch.crates-io]
 sha2 = { git = 'https://github.com/ArtiomTr/universal-precompiles.git', tag = 'sha2-v0.10.9-up.0' }

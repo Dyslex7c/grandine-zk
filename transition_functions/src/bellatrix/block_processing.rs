@@ -10,9 +10,9 @@ use helper_functions::{
     slot_report::SlotReport,
     verifier::{SingleVerifier, Triple, Verifier},
 };
+use pubkey_cache::PubkeyCache;
 use ssz::SszHash as _;
 use typenum::Unsigned as _;
-use pubkey_cache::PubkeyCache;
 use types::{
     bellatrix::{
         beacon_state::BeaconState,

@@ -10,13 +10,13 @@ use helper_functions::{
     slot_report::SlotReport,
     verifier::{NullVerifier, Triple, Verifier, VerifierOption},
 };
+use pubkey_cache::PubkeyCache;
 use ssz::Hc;
 use types::{
     bellatrix::{beacon_state::BeaconState, containers::SignedBeaconBlock},
     config::Config,
     preset::Preset,
 };
-use pubkey_cache::PubkeyCache;
 
 use super::{block_processing, slot_processing};
 use crate::{

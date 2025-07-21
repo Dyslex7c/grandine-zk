@@ -1,10 +1,10 @@
 use core::ops::{Range, RangeFrom, RangeToInclusive};
+#[cfg(not(target_os = "zkvm"))]
+use std::path::Path;
 use std::{
     borrow::Cow,
     sync::{Arc, Mutex},
 };
-#[cfg(not(target_os = "zkvm"))]
-use std::path::Path;
 
 use anyhow::Result;
 use bytesize::ByteSize;
@@ -14,9 +14,9 @@ use im::OrdMap;
 use itertools::Either;
 #[cfg(not(target_os = "zkvm"))]
 use libmdbx::{DatabaseFlags, Environment, Geometry, ObjectLength, Stat, WriteFlags};
-use log::error;
 #[cfg(not(target_os = "zkvm"))]
 use log::debug;
+use log::error;
 use snap::raw::{Decoder, Encoder};
 use std_ext::ArcExt as _;
 use tap::Pipe as _;
@@ -324,8 +324,8 @@ impl Database {
             DatabaseKind::InMemory { map } => {
                 let map = map.lock().expect("in-memory database mutex is poisoned");
 
-                let it =
-                map.clone()
+                let it = map
+                    .clone()
                     .into_iter()
                     .map(|(key, value)| Ok((Cow::Owned(key.to_vec()), value.len())));
 
@@ -333,7 +333,7 @@ impl Database {
                 {
                     it.pipe(Either::Right)
                 }
-                
+
                 #[cfg(target_os = "zkvm")]
                 {
                     it
@@ -381,16 +381,15 @@ impl Database {
                         .expect_none("start_pair should have been discarded by OrdMap::split");
                 }
 
-                let it = above
-                    .into_iter()
-                    .map(|(key, value)| Ok((Cow::Owned(key.to_vec()), decompress(value.as_ref())?)));
+                let it = above.into_iter().map(|(key, value)| {
+                    Ok((Cow::Owned(key.to_vec()), decompress(value.as_ref())?))
+                });
 
-                
                 #[cfg(not(target_os = "zkvm"))]
                 {
                     it.pipe(Either::Right)
                 }
-                
+
                 #[cfg(target_os = "zkvm")]
                 {
                     it
@@ -438,17 +437,15 @@ impl Database {
                         .expect_none("end_pair should have been discarded by OrdMap::split");
                 }
 
-                let it = 
-                below
-                    .into_iter()
-                    .rev()
-                    .map(|(key, value)| Ok((Cow::Owned(key.to_vec()), decompress(value.as_ref())?)));
+                let it = below.into_iter().rev().map(|(key, value)| {
+                    Ok((Cow::Owned(key.to_vec()), decompress(value.as_ref())?))
+                });
 
                 #[cfg(not(target_os = "zkvm"))]
                 {
                     it.pipe(Either::Right)
                 }
-                
+
                 #[cfg(target_os = "zkvm")]
                 {
                     it
@@ -575,6 +572,14 @@ impl Database {
     }
 }
 
+impl From<InMemoryMap> for Database {
+    fn from(map: InMemoryMap) -> Self {
+        Self(DatabaseKind::InMemory {
+            map: Mutex::new(map),
+        })
+    }
+}
+
 enum DatabaseKind {
     #[cfg(not(target_os = "zkvm"))]
     Persistent {
@@ -610,7 +615,7 @@ enum DatabaseKind {
 #[error("database directory path should be a valid Unicode string")]
 struct Error;
 
-type InMemoryMap = OrdMap<Arc<[u8]>, Arc<[u8]>>;
+pub type InMemoryMap = OrdMap<Arc<[u8]>, Arc<[u8]>>;
 
 fn compress(data: &[u8]) -> Result<Vec<u8>> {
     Encoder::new().compress_vec(data).map_err(Into::into)

@@ -10,17 +10,16 @@ use anyhow::Result;
 use backend::{Vm, VmBackend as _};
 use bls as _;
 use clap::{Parser, Subcommand};
+use database::Database;
+use pubkey_cache::PubkeyCache;
 use reqwest::IntoUrl;
-use ssz::{SszHash as _, SszRead as _};
+use ssz::{SszHash as _, SszRead as _, SszWrite as _, H256};
 use transition_functions::combined::untrusted_state_transition as state_transition;
 use types::{
     combined::{BeaconState, SignedBeaconBlock},
     config::Config,
     preset::Mainnet,
-    traits::BeaconState as _,
 };
-use pubkey_cache::PubkeyCache;
-use database::Database;
 
 use crate::backend::{ProofTrait, ReportTrait};
 
@@ -34,8 +33,6 @@ struct Test {
     block_url: &'static str,
     state: &'static str,
     state_url: &'static str,
-
-    expected_slot: u64,
 }
 
 #[derive(Parser, Debug)]
@@ -90,8 +87,6 @@ fn main() -> Result<()> {
             block_url: "https://assets.grandine.io/beacon_block_slot_00021568_root_0xb28a634b89c669141990ed5deceb1.xz",
             state: "../data/pectra-devnet-6/beacon_state_slot_00021567_root_0xd51b605669c3e1ec96d83b6ab191d921f276d363621009fa6fd4a171a6bbf943.ssz",
             state_url: "https://assets.grandine.io/beacon_state_slot_00021567_root_0xd51b605669c3e1ec96d83b6ab191d.xz",
-
-            expected_slot: 21568,
         },
         Test {
             name: "pectra-devnet-6 without epoch transition",
@@ -100,8 +95,6 @@ fn main() -> Result<()> {
             block_url: "https://assets.grandine.io/beacon_block_slot_00021569_root_0x91008e253d2dafd1c9cd6a8ccae68.xz",
             state: "../data/pectra-devnet-6/beacon_state_slot_00021568_root_0xb28a634b89c669141990ed5deceb1ea4777869a64cb8eaccb6cb9f4796c5110d.ssz",
             state_url: "https://assets.grandine.io/beacon_state_slot_00021568_root_0xb28a634b89c669141990ed5deceb1.xz",
-
-            expected_slot: 21569,
         },
         Test {
             name: "mainnet without epoch transition",
@@ -110,8 +103,6 @@ fn main() -> Result<()> {
             block_url: "https://assets.grandine.io/beacon_block_slot_11893759_root_0x3a74cd235bf22d0d637b41b320f91.xz",
             state: "../data/mainnet/beacon_state_slot_11893758_root_0x6ae5cfd675459d878fc43a4205967660abc21e8e399195da5013af6b0547420b.ssz",
             state_url: "https://assets.grandine.io/beacon_state_slot_11893758_root_0x6ae5cfd675459d878fc43a4205967.xz",
-
-            expected_slot: 11893759,
         }
     ];
 
@@ -135,51 +126,41 @@ fn main() -> Result<()> {
         selected_test.state_url,
     )?;
 
-    let expected_root = {
+    let (expected_root, cache) = {
         let block = SignedBeaconBlock::<Mainnet>::from_ssz(&config, block_ssz.clone())?;
         let mut state = BeaconState::<Mainnet>::from_ssz(&config, state_ssz.clone())?;
         let cache = PubkeyCache::load(Database::in_memory());
 
         state_transition(&config, &cache, &mut state, &block)?;
-        state.hash_tree_root()
+
+        (state.hash_tree_root(), cache.to_ssz().unwrap())
     };
 
     match args.command {
         Command::Execute => {
             let started_at = Instant::now();
             let vm = Vm::new()?;
-            let (output_bytes, report) = vm.execute(state_ssz, block_ssz)?;
-            let state = BeaconState::<Mainnet>::from_ssz(&config, output_bytes)?;
+            let (output_bytes, report) = vm.execute(state_ssz, block_ssz, cache)?;
+            let state_root = H256(output_bytes.try_into().unwrap());
 
             println!("elapsed: {:?}", started_at.elapsed());
             println!("cycles: {}", report.cycles());
 
-            println!("state slot after state transition: {}", state.slot());
-            println!(
-                "state root after state transition: {:?}",
-                state.hash_tree_root()
-            );
-            assert_eq!(state.slot(), selected_test.expected_slot);
-            assert_eq!(state.hash_tree_root(), expected_root);
+            println!("state root after state transition: {:?}", state_root);
+            assert_eq!(state_root, expected_root);
         }
         Command::Prove => {
             let started_at = Instant::now();
             let vm = Vm::new()?;
-            let (output_bytes, proof) = vm.prove(state_ssz, block_ssz)?;
-            let state = BeaconState::<Mainnet>::from_ssz(&config, output_bytes)?;
+            let (output_bytes, proof) = vm.prove(state_ssz, block_ssz, cache)?;
+            let state_root = H256(output_bytes.try_into().unwrap());
             println!("elapsed: {:?}", started_at.elapsed());
-            // println!("cycles: {}", proof.cycles());
-            println!("state slot after state transition: {}", state.slot());
-            println!(
-                "state root after state transition: {:?}",
-                state.hash_tree_root()
-            );
+            println!("state root after state transition: {:?}", state_root);
 
             proof.save(Path::new(env!("CARGO_MANIFEST_DIR")).join("proof.bin"))?;
 
             assert_eq!(proof.verify(), true);
-            assert_eq!(state.slot(), selected_test.expected_slot);
-            assert_eq!(state.hash_tree_root(), expected_root);
+            assert_eq!(state_root, expected_root);
         }
     }
 

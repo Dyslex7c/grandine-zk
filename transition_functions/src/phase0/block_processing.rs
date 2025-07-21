@@ -12,8 +12,8 @@ use helper_functions::{
     slot_report::{NullSlotReport, SlotReport},
     verifier::{SingleVerifier, Triple, Verifier},
 };
-use typenum::Unsigned as _;
 use pubkey_cache::PubkeyCache;
+use typenum::Unsigned as _;
 use types::{
     config::Config,
     nonstandard::{smallvec, AttestationEpoch, SlashingKind},

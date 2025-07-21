@@ -6,28 +6,31 @@
 sp1_zkvm::entrypoint!(main);
 
 use anyhow::Result;
-use ssz::{SszRead as _, SszWrite as _};
+use ssz::{SszRead as _, SszWrite as _, SszHash as _};
 use transition_functions::combined::untrusted_state_transition as state_transition;
 use types::{
     combined::{BeaconState, SignedBeaconBlock},
     config::Config,
     preset::{Mainnet, Preset},
 };
+use pubkey_cache::PubkeyCache;
 
 fn read_block_and_state<P: Preset>(
     config: &Config,
-) -> Result<(SignedBeaconBlock<P>, BeaconState<P>)> {
+) -> Result<(SignedBeaconBlock<P>, BeaconState<P>, PubkeyCache)> {
     // Read an input to the program.
     //
     // Behind the scenes, this compiles down to a custom system call which handles reading inputs
     // from the prover.
     let state_ssz = sp1_zkvm::io::read_vec();
     let block_ssz = sp1_zkvm::io::read_vec();
+    let cache_ssz = sp1_zkvm::io::read_vec();
 
     let block = SignedBeaconBlock::<P>::from_ssz(config, &block_ssz)?;
     let state = BeaconState::<P>::from_ssz(config, &state_ssz)?;
+    let cache = PubkeyCache::from_ssz(config, &cache_ssz)?;
 
-    Ok((block, state))
+    Ok((block, state, cache))
 }
 
 pub fn main() {
@@ -36,20 +39,20 @@ pub fn main() {
 
     println!("loading block and state...");
 
-    let (block, mut state) = read_block_and_state::<Mainnet>(&config).unwrap();
+    let (block, mut state, cache) = read_block_and_state::<Mainnet>(&config).unwrap();
 
     println!("loaded block and state");
 
     println!("performing state transition...");
 
-    state_transition(&config, &mut state, &block).unwrap();
+    state_transition(&config, &cache, &mut state, &block).unwrap();
 
     println!("performed state transition");
 
 
     // Commit to the public values of the program. The final proof will have a commitment to all the
     // bytes that were committed to.
-    sp1_zkvm::io::commit_slice(&state.to_ssz().unwrap());
+    sp1_zkvm::io::commit_slice(&state.hash_tree_root().0);
 
     println!("committed output");
 }

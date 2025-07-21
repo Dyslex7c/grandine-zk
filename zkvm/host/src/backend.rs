@@ -18,9 +18,19 @@ pub trait VmBackend: Sized {
 
     fn new() -> Result<Self>;
 
-    fn execute(&self, state_ssz: Vec<u8>, block_ssz: Vec<u8>) -> Result<(Vec<u8>, Self::Report)>;
+    fn execute(
+        &self,
+        state_ssz: Vec<u8>,
+        block_ssz: Vec<u8>,
+        cache_ssz: Vec<u8>,
+    ) -> Result<(Vec<u8>, Self::Report)>;
 
-    fn prove(&self, state_ssz: Vec<u8>, block_ssz: Vec<u8>) -> Result<(Vec<u8>, Self::Proof)>;
+    fn prove(
+        &self,
+        state_ssz: Vec<u8>,
+        block_ssz: Vec<u8>,
+        cache_ssz: Vec<u8>,
+    ) -> Result<(Vec<u8>, Self::Proof)>;
 }
 
 #[cfg(feature = "risc0")]
@@ -75,14 +85,17 @@ mod risc0 {
             &self,
             state_ssz: Vec<u8>,
             block_ssz: Vec<u8>,
+            cache_ssz: Vec<u8>,
         ) -> Result<(Vec<u8>, Self::Report)> {
             let prover = default_prover();
 
             let env = ExecutorEnv::builder()
                 .write(&state_ssz.len())?
                 .write(&block_ssz.len())?
+                .write(&cache_ssz.len())?
                 .write_slice(&state_ssz)
                 .write_slice(&block_ssz)
+                .write_slice(&cache_ssz)
                 .build()?;
 
             let elf = RISC0_GRANDINE_STATE_TRANSITION_ELF;
@@ -93,14 +106,21 @@ mod risc0 {
             Ok((receipt.journal.bytes, Report(prove_info.stats)))
         }
 
-        fn prove(&self, state_ssz: Vec<u8>, block_ssz: Vec<u8>) -> Result<(Vec<u8>, Self::Proof)> {
+        fn prove(
+            &self,
+            state_ssz: Vec<u8>,
+            block_ssz: Vec<u8>,
+            cache_ssz: Vec<u8>,
+        ) -> Result<(Vec<u8>, Self::Proof)> {
             let prover = default_prover();
 
             let env = ExecutorEnv::builder()
                 .write(&state_ssz.len())?
                 .write(&block_ssz.len())?
+                .write(&cache_ssz.len())?
                 .write_slice(&state_ssz)
                 .write_slice(&block_ssz)
+                .write_slice(&cache_ssz)
                 .build()?;
 
             let elf = RISC0_GRANDINE_STATE_TRANSITION_ELF;
@@ -167,19 +187,26 @@ mod sp1 {
             &self,
             state_ssz: Vec<u8>,
             block_ssz: Vec<u8>,
+            cache_ssz: Vec<u8>,
         ) -> Result<(Vec<u8>, Self::Report)> {
             let client = ProverClient::from_env();
             let mut stdin = SP1Stdin::new();
 
             stdin.write_slice(&state_ssz);
             stdin.write_slice(&block_ssz);
+            stdin.write_slice(&cache_ssz);
 
             let (output, report) = client.execute(STATE_TRANSITION_ELF, &stdin).run()?;
 
             Ok((output.as_slice().to_vec(), Report(report)))
         }
 
-        fn prove(&self, state_ssz: Vec<u8>, block_ssz: Vec<u8>) -> Result<(Vec<u8>, Self::Proof)> {
+        fn prove(
+            &self,
+            state_ssz: Vec<u8>,
+            block_ssz: Vec<u8>,
+            cache_ssz: Vec<u8>,
+        ) -> Result<(Vec<u8>, Self::Proof)> {
             let client = ProverClient::builder().network().build();
 
             let (pk, vk) = client.setup(STATE_TRANSITION_ELF);
@@ -188,6 +215,7 @@ mod sp1 {
 
             stdin.write_slice(&state_ssz);
             stdin.write_slice(&block_ssz);
+            stdin.write_slice(&cache_ssz);
 
             let proof = client
                 .prove(&pk, &stdin)
