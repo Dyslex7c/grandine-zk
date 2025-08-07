@@ -1,0 +1,10 @@
+[package]
+name = 'zkvm_guest_ziren'
+edition = { workspace = true }
+authors = ["Grandine <info@grandine.io>"]
+
+[dependencies]
+zkm-zkvm = { workspace = true }
+
+[lints]
+workspace = true
