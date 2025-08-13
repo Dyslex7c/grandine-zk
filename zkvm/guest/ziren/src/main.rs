@@ -1,38 +1,57 @@
-//! A simple program that takes a number `n` as input, and writes the `n-1`th and `n`th Fibonacci
-//! number as output.
-
 // These two lines are necessary for the program to properly compile.
 //
 // Under the hood, we wrap your main function with some extra code so that it behaves properly
 // inside the zkVM.
-#![no_std]
 #![no_main]
 zkm_zkvm::entrypoint!(main);
 
-pub fn main() {
+use anyhow::Result;
+use ssz::{SszRead as _, SszWrite as _, SszHash as _};
+use transition_functions::combined::untrusted_state_transition as state_transition;
+use types::{
+    combined::{BeaconState, SignedBeaconBlock},
+    config::Config,
+    preset::{Mainnet, Preset},
+};
+use pubkey_cache::PubkeyCache;
+
+fn read_block_and_state<P: Preset>(
+    config: &Config,
+) -> Result<(SignedBeaconBlock<P>, BeaconState<P>, PubkeyCache)> {
     // Read an input to the program.
     //
-    // Behind the scenes, this compiles down to a system call which handles reading inputs
+    // Behind the scenes, this compiles down to a custom system call which handles reading inputs
     // from the prover.
-    let n = zkm_zkvm::io::read::<u32>();
+    let state_ssz = zkm_zkvm::io::read_vec();
+    let block_ssz = zkm_zkvm::io::read_vec();
+    let cache_ssz = zkm_zkvm::io::read_vec();
 
-    // Write n to public input
-    zkm_zkvm::io::commit(&n);
+    let block = SignedBeaconBlock::<P>::from_ssz(config, &block_ssz)?;
+    let state = BeaconState::<P>::from_ssz(config, &state_ssz)?;
+    let cache = PubkeyCache::from_ssz(config, &cache_ssz)?;
 
-    // Compute the n'th fibonacci number, using normal Rust code.
-    let mut a = 0;
-    let mut b = 1;
-    for _ in 0..n {
-        let mut c = a + b;
-        c %= 7919; // Modulus to prevent overflow.
-        a = b;
-        b = c;
-    }
+    Ok((block, state, cache))
+}
 
-    // Write the output of the program.
-    //
-    // Behind the scenes, this also compiles down to a system call which handles writing
-    // outputs to the prover.
-    zkm_zkvm::io::commit(&a);
-    zkm_zkvm::io::commit(&b);
+pub fn main() {
+    //let config = Config::pectra_devnet_4();
+    let config = Config::pectra_devnet_6();
+
+    println!("loading block and state...");
+
+    let (block, mut state, cache) = read_block_and_state::<Mainnet>(&config).unwrap();
+
+    println!("loaded block and state");
+
+    println!("performing state transition...");
+
+    state_transition(&config, &cache, &mut state, &block).unwrap();
+
+    println!("performed state transition");
+
+    // Commit to the public values of the program. The final proof will have a commitment to all the
+    // bytes that were committed to.
+    zkm_zkvm::io::commit_slice(&state.hash_tree_root().0);
+
+    println!("committed output");
 }
