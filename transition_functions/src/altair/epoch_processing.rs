@@ -279,7 +279,7 @@ pub fn process_sync_committee_updates<P: Preset>(
 ) -> Result<()> {
     let next_epoch = get_current_epoch(state) + 1;
 
-    if next_epoch.is_multiple_of(P::EPOCHS_PER_SYNC_COMMITTEE_PERIOD) {
+    if next_epoch.is_multiple_of(P::EPOCHS_PER_SYNC_COMMITTEE_PERIOD.into()) {
         let committee = get_next_sync_committee(pubkey_cache, state)?;
         *state.current_sync_committee_mut() =
             core::mem::replace(state.next_sync_committee_mut(), committee);

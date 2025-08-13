@@ -2,8 +2,8 @@ use core::{
     cell::{Cell, RefCell, UnsafeCell},
     num::{NonZeroIsize, NonZeroUsize},
     sync::atomic::{
-        AtomicBool, AtomicI16, AtomicI32, AtomicI64, AtomicI8, AtomicIsize, AtomicPtr, AtomicU16,
-        AtomicU32, AtomicU64, AtomicU8, AtomicUsize,
+        AtomicBool, AtomicI16, AtomicI32, AtomicI8, AtomicIsize, AtomicPtr, AtomicU16,
+        AtomicU32, AtomicU8, AtomicUsize,
     },
 };
 use std::sync::{Mutex, RwLock};
@@ -50,12 +50,10 @@ assert_not_impl_any!(AtomicBool: SszHash);
 assert_not_impl_any!(AtomicU8: SszHash);
 assert_not_impl_any!(AtomicU16: SszHash);
 assert_not_impl_any!(AtomicU32: SszHash);
-assert_not_impl_any!(AtomicU64: SszHash);
 assert_not_impl_any!(AtomicUsize: SszHash);
 assert_not_impl_any!(AtomicI8: SszHash);
 assert_not_impl_any!(AtomicI16: SszHash);
 assert_not_impl_any!(AtomicI32: SszHash);
-assert_not_impl_any!(AtomicI64: SszHash);
 assert_not_impl_any!(AtomicIsize: SszHash);
 assert_not_impl_any!(AtomicPtr<H256>: SszHash);
 assert_not_impl_any!(Mutex<H256>: SszHash);

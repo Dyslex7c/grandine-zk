@@ -1912,7 +1912,7 @@ name = "bls-zkcrypto"
 version = "0.0.0"
 dependencies = [
  "bls-core",
- "bls12_381 0.8.0 (git+https://github.com/ArtiomTr/zkcrypto-bls12_381.git?tag=bls12_381%2Fmain-risczero.0)",
+ "bls12_381 0.8.0 (git+https://github.com/ziren-patches/bls12_381?branch=patch-0.8.0)",
  "derivative",
  "derive_more 1.0.0",
  "ff 0.13.1",
@@ -1948,16 +1948,17 @@ dependencies = [
 [[package]]
 name = "bls12_381"
 version = "0.8.0"
-source = "git+https://github.com/ArtiomTr/zkcrypto-bls12_381.git?tag=bls12_381%2Fmain-risczero.0#6f38d28f9d5657d4a7330f6973fd23f793b21ef5"
+source = "git+https://github.com/ziren-patches/bls12_381?branch=patch-0.8.0#6c60e227e78dd331a6052774e7c50d157d5f3965"
 dependencies = [
- "bytemuck",
+ "cfg-if",
  "digest 0.10.7",
  "ff 0.13.1",
  "group 0.13.0",
+ "hex",
  "pairing 0.23.0",
  "rand_core 0.6.4",
- "risc0-bigint2",
  "subtle",
+ "zkm-lib 1.1.1 (git+https://github.com/ProjectZKM/Ziren.git)",
 ]
 
 [[package]]
@@ -10485,16 +10486,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "risc0-bigint2"
-version = "1.4.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9810e2f9e859e2dca279da0b4c53eb87e2186ab21ecaad22a3ffadf3aabebd8d"
-dependencies = [
- "include_bytes_aligned",
- "stability",
-]
-
-[[package]]
 name = "risc0-binfmt"
 version = "2.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -15405,6 +15396,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "zkm-lib"
+version = "1.1.1"
+source = "git+https://github.com/ProjectZKM/Ziren.git#04bd2e68acc50eda1c5eb83dc2ef9edcfbd4719d"
+dependencies = [
+ "bincode",
+ "cfg-if",
+ "serde",
+ "sha2 0.10.9",
+ "zkm-primitives 1.1.1 (git+https://github.com/ProjectZKM/Ziren.git)",
+]
+
+[[package]]
 name = "zkm-primitives"
 version = "1.1.1"
 source = "git+https://github.com/ProjectZKM/Ziren.git?tag=v1.1.1#d429438215971996afcbbfb99a2c4ab71e0d049c"
@@ -15426,6 +15429,24 @@ dependencies = [
 name = "zkm-primitives"
 version = "1.1.1"
 source = "git+https://github.com/ProjectZKM/Ziren.git?branch=main#04bd2e68acc50eda1c5eb83dc2ef9edcfbd4719d"
+dependencies = [
+ "bincode",
+ "hex",
+ "lazy_static",
+ "num-bigint 0.4.6",
+ "p3-field 0.1.0",
+ "p3-koala-bear",
+ "p3-monty-31",
+ "p3-poseidon2 0.1.0",
+ "p3-symmetric 0.1.0",
+ "serde",
+ "sha2 0.10.9",
+]
+
+[[package]]
+name = "zkm-primitives"
+version = "1.1.1"
+source = "git+https://github.com/ProjectZKM/Ziren.git#04bd2e68acc50eda1c5eb83dc2ef9edcfbd4719d"
 dependencies = [
  "bincode",
  "hex",
@@ -15736,6 +15757,12 @@ dependencies = [
 name = "zkvm_guest_ziren"
 version = "0.0.0"
 dependencies = [
+ "anyhow",
+ "bls",
+ "pubkey_cache",
+ "ssz",
+ "transition_functions",
+ "types",
  "zkm-zkvm 1.1.1 (git+https://github.com/ProjectZKM/Ziren.git?tag=v1.1.1)",
 ]
 
