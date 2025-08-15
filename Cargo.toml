@@ -483,8 +483,10 @@ web3 = { git = 'https://github.com/grandinetech/rust-web3.git' }
 winsafe = { version = '0', features = ['kernel', 'psapi'] }
 xz2 = { version = "0.1" }
 zeroize = { version = '1', features = ['derive', 'serde'] }
-zkm-sdk = { git = 'https://github.com/ProjectZKM/Ziren.git', branch = 'main' }
-zkm-zkvm = { git = 'https://github.com/ProjectZKM/Ziren.git', tag = 'v1.1.1'}
+zkm-build = { git = 'https://github.com/ProjectZKM/Ziren.git', tag = 'v1.1.2' }
+zkm-primitives = { git = 'https://github.com/ProjectZKM/Ziren.git', tag = 'v1.1.2' }
+zkm-sdk = { git = 'https://github.com/ProjectZKM/Ziren.git', tag = 'v1.1.2' }
+zkm-zkvm = { git = 'https://github.com/ProjectZKM/Ziren.git', tag = 'v1.1.2' }
 
 allocator = { path = 'allocator' }
 arithmetic = { path = 'arithmetic' }

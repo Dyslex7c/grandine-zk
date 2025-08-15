@@ -10,6 +10,7 @@ pubkey_cache = { path = '../../../pubkey_cache' }
 ssz = { path = '../../../ssz' }
 transition_functions = { path = '../../../transition_functions' }
 types = { path = '../../../types' }
+zkm-primitives = { workspace = true }
 zkm-zkvm = { workspace = true }
 
 [lints]
