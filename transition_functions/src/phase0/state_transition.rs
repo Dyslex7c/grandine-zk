@@ -4,13 +4,17 @@ use anyhow::{anyhow, Result};
 use helper_functions::{
     accessors,
     error::SignatureKind,
-    misc, phase0, predicates,
+    misc, par_utils, phase0, predicates,
     signing::{RandaoEpoch, SignForSingleFork as _},
     slot_report::SlotReport,
     verifier::{NullVerifier, Triple, Verifier, VerifierOption},
 };
 use pubkey_cache::PubkeyCache;
+#[cfg(not(target_os = "zkvm"))]
+use rayon::iter::ParallelIterator as _;
 use ssz::Hc;
+#[cfg(target_os = "zkvm")]
+use ssz::SszHash;
 use std_ext::ArcExt as _;
 use types::{
     config::Config,
@@ -61,6 +65,9 @@ pub fn state_transition<P: Preset, V: Verifier + Send>(
             slot_report,
         )?;
 
+        #[cfg(target_os = "zkvm")]
+        bls::set_rand_seed(state.hash_tree_root().0);
+
         // > Verify state root
         state_root_policy.verify(state, block)?;
 
@@ -68,12 +75,11 @@ pub fn state_transition<P: Preset, V: Verifier + Send>(
     };
 
     if let Some(verify_signatures) = verify_signatures {
-        let signature_result =
-            verify_signatures().map_err(|_| anyhow!("failed to verify signatures"));
+        let (block_result, signature_result) = par_utils::join(process_block, verify_signatures);
 
-        let block_result = process_block().map_err(|_| anyhow!("failed to process block"));
-
-        signature_result.and(block_result)
+        signature_result
+            .map_err(|_| anyhow!("failed to verify signatures"))
+            .and(block_result.map_err(|_| anyhow!("failed to process block")))
     } else {
         process_block()
     }
@@ -166,8 +172,7 @@ pub fn verify_signatures<P: Preset>(
 
     accessors::initialize_shuffled_indices(state, attestations)?;
 
-    let triples = attestations
-        .iter()
+    let triples = helper_functions::par_iter!(attestations)
         .map(|attestation| {
             let indexed_attestation = phase0::get_indexed_attestation(state, attestation)?;
 

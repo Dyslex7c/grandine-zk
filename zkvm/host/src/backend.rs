@@ -2,6 +2,12 @@ use std::path::Path;
 
 use anyhow::Result;
 
+#[derive(Clone, Copy, Debug)]
+pub enum ConfigKind {
+    Mainnet = 0,
+    PectraDevnet6 = 1,
+}
+
 pub trait ReportTrait {
     fn cycles(&self) -> u64;
 }
@@ -20,22 +26,26 @@ pub trait VmBackend: Sized {
 
     fn execute(
         &self,
+        config: ConfigKind,
         state_ssz: Vec<u8>,
         block_ssz: Vec<u8>,
         cache_ssz: Vec<u8>,
+        phase_bytes: Vec<u8>,
     ) -> Result<(Vec<u8>, Self::Report)>;
 
     fn prove(
         &self,
+        config: ConfigKind,
         state_ssz: Vec<u8>,
         block_ssz: Vec<u8>,
         cache_ssz: Vec<u8>,
+        phase_bytes: Vec<u8>,
     ) -> Result<(Vec<u8>, Self::Proof)>;
 }
 
 #[cfg(feature = "risc0")]
 mod risc0 {
-    use super::{ProofTrait, ReportTrait, VmBackend};
+    use super::{ProofTrait, ReportTrait, VmBackend, ConfigKind};
     use anyhow::Result;
     use borsh::BorshSerialize;
     use risc0_zkvm::{default_prover, ExecutorEnv, Receipt, SessionStats};
@@ -83,19 +93,24 @@ mod risc0 {
 
         fn execute(
             &self,
+            config: ConfigKind,
             state_ssz: Vec<u8>,
             block_ssz: Vec<u8>,
             cache_ssz: Vec<u8>,
+            phase_bytes: Vec<u8>,
         ) -> Result<(Vec<u8>, Self::Report)> {
             let prover = default_prover();
 
             let env = ExecutorEnv::builder()
+                .write(&(config as u8))?
                 .write(&state_ssz.len())?
                 .write(&block_ssz.len())?
                 .write(&cache_ssz.len())?
+                .write(&phase_bytes.len())?
                 .write_slice(&state_ssz)
                 .write_slice(&block_ssz)
                 .write_slice(&cache_ssz)
+                .write_slice(&phase_bytes)
                 .build()?;
 
             let elf = RISC0_GRANDINE_STATE_TRANSITION_ELF;
@@ -108,19 +123,24 @@ mod risc0 {
 
         fn prove(
             &self,
+            config: ConfigKind,
             state_ssz: Vec<u8>,
             block_ssz: Vec<u8>,
             cache_ssz: Vec<u8>,
+            phase_bytes: Vec<u8>,
         ) -> Result<(Vec<u8>, Self::Proof)> {
             let prover = default_prover();
 
             let env = ExecutorEnv::builder()
+                .write(&(config as u8))?
                 .write(&state_ssz.len())?
                 .write(&block_ssz.len())?
                 .write(&cache_ssz.len())?
+                .write(&phase_bytes.len())?
                 .write_slice(&state_ssz)
                 .write_slice(&block_ssz)
                 .write_slice(&cache_ssz)
+                .write_slice(&phase_bytes)
                 .build()?;
 
             let elf = RISC0_GRANDINE_STATE_TRANSITION_ELF;
@@ -138,7 +158,7 @@ pub use risc0::*;
 
 #[cfg(feature = "sp1")]
 mod sp1 {
-    use super::{ProofTrait, ReportTrait, VmBackend};
+    use super::{ProofTrait, ReportTrait, VmBackend, ConfigKind};
     use anyhow::Result;
     use sp1_sdk::{
         include_elf, ExecutionReport, Prover, ProverClient, SP1ProofWithPublicValues, SP1Stdin,
@@ -185,16 +205,20 @@ mod sp1 {
 
         fn execute(
             &self,
+            config: ConfigKind,
             state_ssz: Vec<u8>,
             block_ssz: Vec<u8>,
             cache_ssz: Vec<u8>,
+            phase_bytes: Vec<u8>,
         ) -> Result<(Vec<u8>, Self::Report)> {
             let client = ProverClient::from_env();
             let mut stdin = SP1Stdin::new();
 
+            stdin.write(&(config as u8));
             stdin.write_slice(&state_ssz);
             stdin.write_slice(&block_ssz);
             stdin.write_slice(&cache_ssz);
+            stdin.write_slice(&phase_bytes);
 
             let (output, report) = client.execute(STATE_TRANSITION_ELF, &stdin).run()?;
 
@@ -203,9 +227,11 @@ mod sp1 {
 
         fn prove(
             &self,
+            config: ConfigKind,
             state_ssz: Vec<u8>,
             block_ssz: Vec<u8>,
             cache_ssz: Vec<u8>,
+            phase_bytes: Vec<u8>,
         ) -> Result<(Vec<u8>, Self::Proof)> {
             let client = ProverClient::builder().network().build();
 
@@ -213,9 +239,11 @@ mod sp1 {
 
             let mut stdin = SP1Stdin::new();
 
+            stdin.write(&(config as u8));
             stdin.write_slice(&state_ssz);
             stdin.write_slice(&block_ssz);
             stdin.write_slice(&cache_ssz);
+            stdin.write_slice(&phase_bytes);
 
             let proof = client
                 .prove(&pk, &stdin)
@@ -234,7 +262,7 @@ pub use sp1::*;
 
 #[cfg(feature = "ziren")]
 mod ziren {
-    use super::{ProofTrait, ReportTrait, VmBackend};
+    use super::{ProofTrait, ReportTrait, VmBackend, ConfigKind};
     use anyhow::Result;
     use std::path::Path;
     use zkm_sdk::{include_elf, ProverClient, ZKMProofWithPublicValues, ZKMStdin};
@@ -270,23 +298,27 @@ mod ziren {
 
         fn new() -> Result<Self> {
             // ZKM SDK logger setup if available
-            // zkm_sdk::utils::setup_logger();
+            zkm_sdk::utils::setup_logger();
             
             Ok(Vm)
         }
 
         fn execute(
             &self,
+            config: ConfigKind,
             state_ssz: Vec<u8>,
             block_ssz: Vec<u8>,
             cache_ssz: Vec<u8>,
+            phase_bytes: Vec<u8>,
         ) -> Result<(Vec<u8>, Self::Report)> {
             let client = ProverClient::new();
             let mut stdin = ZKMStdin::new();
 
+            stdin.write(&(config as u8));
             stdin.write_slice(&state_ssz);
             stdin.write_slice(&block_ssz);
             stdin.write_slice(&cache_ssz);
+            stdin.write_slice(&phase_bytes);
 
             let (output, report) = client.execute(STATE_TRANSITION_ELF, stdin).run()?;
 
@@ -295,9 +327,11 @@ mod ziren {
 
         fn prove(
             &self,
+            config: ConfigKind,
             state_ssz: Vec<u8>,
             block_ssz: Vec<u8>,
             cache_ssz: Vec<u8>,
+            phase_bytes: Vec<u8>,
         ) -> Result<(Vec<u8>, Self::Proof)> {
             let client = ProverClient::new();
             
@@ -305,9 +339,11 @@ mod ziren {
 
             let mut stdin = ZKMStdin::new();
 
+            stdin.write(&(config as u8));
             stdin.write_slice(&state_ssz);
             stdin.write_slice(&block_ssz);
             stdin.write_slice(&cache_ssz);
+            stdin.write_slice(&phase_bytes);
 
             let proof = client.prove(&pk, stdin).run()?;
 

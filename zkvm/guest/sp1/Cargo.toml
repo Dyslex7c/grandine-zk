@@ -8,14 +8,15 @@ authors = ["Grandine <info@grandine.io>"]
 [dependencies]
 anyhow = '1'
 bls = { path = '../../../bls', features = ['zkcrypto'] }
+enum-iterator = '2'
 pubkey_cache = { path = '../../../pubkey_cache' }
-sp1-zkvm = '5.0.0'
+sp1-zkvm = { version = '5.2.1', features = ['embedded'] }
 ssz = { path = '../../../ssz' }
 transition_functions = { path = '../../../transition_functions' }
 types = { path = '../../../types' }
 
 [patch.crates-io]
-sha2 = { git = 'https://github.com/ArtiomTr/universal-precompiles.git', tag = 'sha2-v0.10.9-up.0' }
+sha2 = { git = 'https://github.com/grandinetech/universal-precompiles.git', tag = 'sha2-v0.10.9-up.0' }
 
 [patch.'https://github.com/zkcrypto/bls12_381.git']
-bls12_381 = { git = "https://github.com/sp1-patches/bls12_381", tag = "patch-0.8.0-sp1-5.0.0" }
+bls12_381 = { git = 'https://github.com/grandinetech/universal-precompiles.git', tag = 'bls12_381-6bb9695-up.0' }

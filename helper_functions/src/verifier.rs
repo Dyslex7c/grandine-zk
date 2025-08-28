@@ -10,7 +10,7 @@ use bls::{
 use derive_more::Constructor;
 use enumset::{EnumSet, EnumSetType};
 #[cfg(not(target_os = "zkvm"))]
-use rayon::iter::{IntoParallelRefIterator as _, ParallelBridge as _, ParallelIterator as _};
+use rayon::iter::{ParallelBridge as _, ParallelIterator as _};
 use static_assertions::assert_not_impl_any;
 use tap::TryConv as _;
 use types::phase0::primitives::H256;

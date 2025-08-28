@@ -6,6 +6,7 @@ authors = ["Grandine <info@grandine.io>"]
 [dependencies]
 anyhow = '1'
 bls = { path = '../../../bls', features = ['zkcrypto'] }
+enum-iterator = '2'
 pubkey_cache = { path = '../../../pubkey_cache' }
 ssz = { path = '../../../ssz' }
 transition_functions = { path = '../../../transition_functions' }

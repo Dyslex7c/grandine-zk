@@ -6,18 +6,24 @@
 zkm_zkvm::entrypoint!(main);
 
 use anyhow::Result;
-use ssz::{SszRead as _, SszWrite as _, SszHash as _};
+use pubkey_cache::PubkeyCache;
+use ssz::{SszHash as _, SszRead as _};
 use transition_functions::combined::untrusted_state_transition as state_transition;
 use types::{
     combined::{BeaconState, SignedBeaconBlock},
     config::Config,
+    nonstandard::Phase,
     preset::{Mainnet, Preset},
 };
-use pubkey_cache::PubkeyCache;
 
-fn read_block_and_state<P: Preset>(
-    config: &Config,
-) -> Result<(SignedBeaconBlock<P>, BeaconState<P>, PubkeyCache)> {
+fn read_block_and_state<P: Preset>() -> Result<(Config, SignedBeaconBlock<P>, BeaconState<P>, PubkeyCache)> {
+    let config_kind: u8 = zkm_zkvm::io::read();
+    let config = match config_kind {
+        0 => Config::mainnet(),
+        1 => Config::pectra_devnet_6(),
+        v => panic!("unknown config kind {v}"),
+    };
+
     // Read an input to the program.
     //
     // Behind the scenes, this compiles down to a custom system call which handles reading inputs
@@ -25,21 +31,32 @@ fn read_block_and_state<P: Preset>(
     let state_ssz = zkm_zkvm::io::read_vec();
     let block_ssz = zkm_zkvm::io::read_vec();
     let cache_ssz = zkm_zkvm::io::read_vec();
+    let phase_bytes = zkm_zkvm::io::read_vec();
 
-    let block = SignedBeaconBlock::<P>::from_ssz(config, &block_ssz)?;
-    let state = BeaconState::<P>::from_ssz(config, &state_ssz)?;
-    let cache = PubkeyCache::from_ssz(config, &cache_ssz)?;
+    let phase = enum_iterator::all::<Phase>()
+        .zip(0_u8..)
+        .find(|(_, index)| phase_bytes.get(0) == Some(&index))
+        .map(|(phase, _)| phase);
 
-    Ok((block, state, cache))
+    let block = match phase {
+        Some(phase) => SignedBeaconBlock::<P>::from_ssz_at_phase(phase, &block_ssz)?,
+        None => SignedBeaconBlock::<P>::from_ssz(&config, &block_ssz)?,
+    };
+
+    let state = match phase {
+        Some(phase) => BeaconState::<P>::from_ssz_at_phase(phase, &state_ssz)?,
+        None => BeaconState::<P>::from_ssz(&config, &state_ssz)?,
+    };
+
+    let cache = PubkeyCache::from_ssz(&config, &cache_ssz)?;
+
+    Ok((config, block, state, cache))
 }
 
 pub fn main() {
-    //let config = Config::pectra_devnet_4();
-    let config = Config::pectra_devnet_6();
-
     println!("loading block and state...");
 
-    let (block, mut state, cache) = read_block_and_state::<Mainnet>(&config).unwrap();
+    let (config, block, mut state, cache) = read_block_and_state::<Mainnet>().unwrap();
 
     println!("loaded block and state");
 

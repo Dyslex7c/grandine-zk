@@ -155,14 +155,7 @@ impl<P: Preset> SszRead<Config> for BeaconState<P> {
         let slot = Slot::from_ssz_default(slot_bytes)?;
         let phase = config.phase_at_slot::<P>(slot);
 
-        let state = match phase {
-            Phase::Phase0 => Self::Phase0(SszReadDefault::from_ssz_default(bytes)?),
-            Phase::Altair => Self::Altair(SszReadDefault::from_ssz_default(bytes)?),
-            Phase::Bellatrix => Self::Bellatrix(SszReadDefault::from_ssz_default(bytes)?),
-            Phase::Capella => Self::Capella(SszReadDefault::from_ssz_default(bytes)?),
-            Phase::Deneb => Self::Deneb(SszReadDefault::from_ssz_default(bytes)?),
-            Phase::Electra => Self::Electra(SszReadDefault::from_ssz_default(bytes)?),
-        };
+        let state = Self::from_ssz_at_phase(phase, bytes)?;
 
         assert_eq!(slot, state.slot());
 
@@ -347,6 +340,19 @@ impl<P: Preset> BeaconState<P> {
             Self::Electra(state) => Some(state.deposit_requests_start_index),
         }
     }
+
+    pub fn from_ssz_at_phase(phase: Phase, bytes: &[u8]) -> Result<Self, ReadError> {
+        let state = match phase {
+            Phase::Phase0 => Self::Phase0(SszReadDefault::from_ssz_default(bytes)?),
+            Phase::Altair => Self::Altair(SszReadDefault::from_ssz_default(bytes)?),
+            Phase::Bellatrix => Self::Bellatrix(SszReadDefault::from_ssz_default(bytes)?),
+            Phase::Capella => Self::Capella(SszReadDefault::from_ssz_default(bytes)?),
+            Phase::Deneb => Self::Deneb(SszReadDefault::from_ssz_default(bytes)?),
+            Phase::Electra => Self::Electra(SszReadDefault::from_ssz_default(bytes)?),
+        };
+
+        Ok(state)
+    }
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, From, VariantCount, Deserialize, Serialize)]
@@ -390,14 +396,7 @@ impl<P: Preset> SszRead<Config> for SignedBeaconBlock<P> {
         let slot = Slot::from_ssz_default(slot_bytes)?;
         let phase = config.phase_at_slot::<P>(slot);
 
-        let block = match phase {
-            Phase::Phase0 => Self::Phase0(SszReadDefault::from_ssz_default(bytes)?),
-            Phase::Altair => Self::Altair(SszReadDefault::from_ssz_default(bytes)?),
-            Phase::Bellatrix => Self::Bellatrix(SszReadDefault::from_ssz_default(bytes)?),
-            Phase::Capella => Self::Capella(SszReadDefault::from_ssz_default(bytes)?),
-            Phase::Deneb => Self::Deneb(SszReadDefault::from_ssz_default(bytes)?),
-            Phase::Electra => Self::Electra(SszReadDefault::from_ssz_default(bytes)?),
-        };
+        let block = Self::from_ssz_at_phase(phase, bytes)?;
 
         assert_eq!(slot, block.message().slot());
 
@@ -501,6 +500,19 @@ impl<P: Preset> SignedBeaconBlock<P> {
 
     pub fn to_header(&self) -> SignedBeaconBlockHeader {
         self.message().to_header().with_signature(self.signature())
+    }
+
+    pub fn from_ssz_at_phase(phase: Phase, bytes: &[u8]) -> Result<Self, ReadError> {
+        let block = match phase {
+            Phase::Phase0 => Self::Phase0(SszReadDefault::from_ssz_default(bytes)?),
+            Phase::Altair => Self::Altair(SszReadDefault::from_ssz_default(bytes)?),
+            Phase::Bellatrix => Self::Bellatrix(SszReadDefault::from_ssz_default(bytes)?),
+            Phase::Capella => Self::Capella(SszReadDefault::from_ssz_default(bytes)?),
+            Phase::Deneb => Self::Deneb(SszReadDefault::from_ssz_default(bytes)?),
+            Phase::Electra => Self::Electra(SszReadDefault::from_ssz_default(bytes)?),
+        };
+
+        Ok(block)
     }
 }
 

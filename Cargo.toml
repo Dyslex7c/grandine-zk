@@ -374,7 +374,7 @@ itertools = '0.14'
 jwt-simple = { version = '0.12', default-features = false, features = ['pure-rust'] }
 kzg = { git = 'https://github.com/grandinetech/rust-kzg.git' }
 lazy_static = '1'
-libmdbx = { git = 'https://github.com/paradigmxyz/reth.git', package = 'reth-libmdbx', rev = '44ab192899a898e2499ef20870629bb7a765f2a2' }
+libmdbx = { git = 'https://github.com/paradigmxyz/reth.git', package = 'reth-libmdbx', rev = '6f8e7258f4733279080e4bd8345ce50538a40d6e' }
 libp2p = { version = '0.55', default-features = false, features = ['metrics', 'dns', 'ecdsa', 'identify', 'macros', 'noise', 'plaintext', 'secp256k1', 'serde', 'tcp', 'tokio', 'yamux', 'quic', 'upnp'] }
 libp2p-mplex = '0.43'
 libp2p-identity = { version = '0.2.10', features = ['peerid'] }
@@ -415,8 +415,8 @@ refinery = { version = '0.8',  features = ['rusqlite'] }
 regex = '1'
 replace_with = '0.1'
 reqwest = { version = '0.12', features = ['json', 'native-tls-vendored'] }
-risc0-build = { version = '2.1.2', features = ['unstable'] }
-risc0-zkvm = { version = '2.1.0', features = ['unstable', 'heap-embedded-alloc'] }
+risc0-build = { version = '2.3.1', features = ['unstable'] }
+risc0-zkvm = { version = '2.3.1', features = ['unstable', 'heap-embedded-alloc'] }
 rusqlite = { version = '0.33', features = ['bundled'] }
 rust-kzg-arkworks5 = { git = 'https://github.com/grandinetech/rust-kzg.git' }
 rust-kzg-blst = { git = 'https://github.com/grandinetech/rust-kzg.git' }
@@ -436,18 +436,16 @@ serde_with = '3'
 serde_yaml = '0.9'
 # The `asm` feature in `sha2` doesn't do anything on recent `x86_64` CPUs
 # because `sha2` defaults to using CPU intrinsics.
-sha2 = { git = 'https://github.com/ArtiomTr/universal-precompiles.git', tag = 'sha2-v0.10.9-up.0', features = ['compress'] }
-
+sha2 = { git = 'https://github.com/grandinetech/universal-precompiles.git', tag = 'sha2-v0.10.9-up.0', features = ['compress'] }
 slog = { version = '2', features = ['max_level_trace'] }
 slog-async = '2'
 slog-stdlog = '4'
 slog-term = '2'
 smallvec = { version = '1', features = ['serde', 'union'] }
 snap = '1'
-sp1-helper = "5.0.0"
-sp1-sdk = '5.0.3'
-# sp1-zkvm = { path = "../sp1/crates/zkvm/entrypoint", features = ['embedded'] }
-sp1-zkvm = "5.0.0"
+sp1-helper = '5.2.1'
+sp1-sdk = '5.2.1'
+sp1-zkvm = { version = '5.2.1', features = ['embedded'] }
 static_assertions = '1'
 strum = { version = '0.26', features = ['derive'] }
 syn = { version = '2', features = ['full'] }

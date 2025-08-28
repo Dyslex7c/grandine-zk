@@ -664,59 +664,6 @@ impl Config {
         }
     }
 
-    // [Mekong devnet configuration](https://github.com/ethpandaops/mekong-devnets/blob/91b6121b3e8eafc7921eaa83b33620183e57dc65/network-configs/devnet-0/metadata/config.yaml)
-    #[must_use]
-    pub fn mekong() -> Self {
-        Self {
-            // Meta
-            config_name: Cow::Borrowed("testnet"),
-
-            // Genesis
-            genesis_delay: 60,
-            genesis_fork_version: H32(hex!("10000000")),
-            min_genesis_active_validator_count: nonzero!(100_000_u64),
-            min_genesis_time: 1_730_372_340,
-
-            // Forking
-            altair_fork_epoch: 0,
-            altair_fork_version: H32(hex!("20000000")),
-            bellatrix_fork_epoch: 0,
-            bellatrix_fork_version: H32(hex!("30000000")),
-            capella_fork_epoch: 0,
-            capella_fork_version: H32(hex!("40000000")),
-            deneb_fork_epoch: 0,
-            deneb_fork_version: H32(hex!("50637624")),
-            electra_fork_epoch: 256,
-            electra_fork_version: H32(hex!("60637624")),
-            eip7594_fork_epoch: 99999,
-
-            // Time parameters
-            seconds_per_eth1_block: 12,
-            shard_committee_period: 256,
-
-            // Deposit contract
-            deposit_chain_id: 7_078_815_900,
-            deposit_contract_address: H160(hex!("4242424242424242424242424242424242424242")),
-            deposit_network_id: 7_078_815_900,
-
-            // Networking
-            max_request_blocks: 1024,
-            data_column_sidecar_subnet_count: 128,
-
-            // Transition
-            terminal_block_hash: ExecutionBlockHash::zero(),
-            terminal_block_hash_activation_epoch: FAR_FUTURE_EPOCH,
-            terminal_total_difficulty: Difficulty::from_be_bytes(hex!(
-                "0000000000000000000000000000000000000000000000000000000000000000"
-            )),
-
-            // Custody
-            samples_per_slot: 8,
-
-            ..Self::default()
-        }
-    }
-
     // [Pectra devnet 6 configuration](https://github.com/ethpandaops/pectra-devnets/blob/8bb780acb223896287ffb034db571455c876e56d/network-configs/devnet-6/metadata/config.yaml)
     #[must_use]
     pub fn pectra_devnet_6() -> Self {

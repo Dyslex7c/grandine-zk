@@ -12,10 +12,11 @@ bls = { workspace = true, features = ['zkcrypto'] }
 borsh = { workspace = true, optional = true }
 clap = { workspace = true, features = ['derive'] }
 database = { workspace = true }
+enum-iterator = { workspace = true }
 pubkey_cache = { workspace = true }
 reqwest = { workspace = true, features = ["blocking"] }
 risc0-zkvm = { workspace = true, optional = true, features = ['unstable', 'heap-embedded-alloc'] }
-zkm-sdk = { workspace = true, optional = true }
+snap = { workspace = true }
 sp1-sdk = { workspace = true, optional = true }
 ssz = { workspace = true }
 tracing-subscriber = { workspace = true, optional = true }
@@ -23,6 +24,7 @@ transition_functions = { workspace = true }
 types = { workspace = true }
 xz2 = { workspace = true }
 zkvm_guest_risc0 = { workspace = true, optional = true }
+zkm-sdk = { workspace = true, optional = true }
 zkvm_guest_ziren = { workspace = true, optional = true }
 
 [build-dependencies]
