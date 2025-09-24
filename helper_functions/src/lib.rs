@@ -7,6 +7,7 @@ pub mod error;
 pub mod fork;
 pub mod misc;
 pub mod mutators;
+pub mod par_utils;
 pub mod phase0;
 pub mod predicates;
 pub mod signing;
@@ -19,5 +20,3 @@ pub mod verifier;
 // - <https://github.com/rust-lang/rust/issues/79381>
 #[cfg(test)]
 mod spec_tests;
-
-mod par_utils;

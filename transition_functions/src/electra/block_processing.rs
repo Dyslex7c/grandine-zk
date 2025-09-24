@@ -36,6 +36,8 @@ use helper_functions::{
 };
 use itertools::izip;
 use pubkey_cache::PubkeyCache;
+#[cfg(not(target_os = "zkvm"))]
+use rayon::iter::ParallelIterator as _;
 use ssz::{PersistentList, SszHash as _};
 use tap::Pipe as _;
 use try_from_iterator::TryFromIterator as _;
@@ -580,9 +582,7 @@ pub fn process_operations<P: Preset, V: Verifier>(
     } else {
         initialize_shuffled_indices(state, body.attestations().iter())?;
 
-        let triples = body
-            .attestations()
-            .iter()
+        let triples = helper_functions::par_iter!(body.attestations())
             .map(|attestation| {
                 let mut triple = Triple::default();
 

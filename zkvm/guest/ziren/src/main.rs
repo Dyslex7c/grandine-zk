@@ -3,7 +3,7 @@
 // Under the hood, we wrap your main function with some extra code so that it behaves properly
 // inside the zkVM.
 #![no_main]
-sp1_zkvm::entrypoint!(main);
+zkm_zkvm::entrypoint!(main);
 
 use anyhow::Result;
 use pubkey_cache::PubkeyCache;
@@ -17,7 +17,7 @@ use types::{
 };
 
 fn read_block_and_state<P: Preset>() -> Result<(Config, SignedBeaconBlock<P>, BeaconState<P>, PubkeyCache)> {
-    let config_kind: u8 = sp1_zkvm::io::read();
+    let config_kind: u8 = zkm_zkvm::io::read();
     let config = match config_kind {
         0 => Config::mainnet(),
         1 => Config::pectra_devnet_6(),
@@ -28,10 +28,10 @@ fn read_block_and_state<P: Preset>() -> Result<(Config, SignedBeaconBlock<P>, Be
     //
     // Behind the scenes, this compiles down to a custom system call which handles reading inputs
     // from the prover.
-    let state_ssz = sp1_zkvm::io::read_vec();
-    let block_ssz = sp1_zkvm::io::read_vec();
-    let cache_ssz = sp1_zkvm::io::read_vec();
-    let phase_bytes = sp1_zkvm::io::read_vec();
+    let state_ssz = zkm_zkvm::io::read_vec();
+    let block_ssz = zkm_zkvm::io::read_vec();
+    let cache_ssz = zkm_zkvm::io::read_vec();
+    let phase_bytes = zkm_zkvm::io::read_vec();
 
     let phase = enum_iterator::all::<Phase>()
         .zip(0_u8..)
@@ -68,7 +68,7 @@ pub fn main() {
 
     // Commit to the public values of the program. The final proof will have a commitment to all the
     // bytes that were committed to.
-    sp1_zkvm::io::commit_slice(&state.hash_tree_root().0);
+    zkm_zkvm::io::commit_slice(&state.hash_tree_root().0);
 
     println!("committed output");
 }

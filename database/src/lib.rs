@@ -7,23 +7,28 @@ use std::{
 };
 
 use anyhow::Result;
+#[cfg(not(target_os = "zkvm"))]
 use bytesize::ByteSize;
 #[cfg(not(target_os = "zkvm"))]
 use futures::channel::mpsc::UnboundedSender;
 use im::OrdMap;
+#[cfg(not(target_os = "zkvm"))]
 use itertools::Either;
 #[cfg(not(target_os = "zkvm"))]
 use libmdbx::{DatabaseFlags, Environment, Geometry, ObjectLength, Stat, WriteFlags};
 #[cfg(not(target_os = "zkvm"))]
-use log::debug;
-use log::error;
+use log::{debug, error};
 use snap::raw::{Decoder, Encoder};
 use std_ext::ArcExt as _;
 use tap::Pipe as _;
+#[cfg(not(target_os = "zkvm"))]
 use thiserror::Error;
 use unwrap_none::UnwrapNone as _;
 
+#[cfg(not(target_os = "zkvm"))]
 const GROWTH_STEP: ByteSize = ByteSize::mib(256);
+
+#[cfg(not(target_os = "zkvm"))]
 const MAX_NAMED_DATABASES: usize = 10;
 
 pub trait PrefixableKey {
@@ -611,6 +616,7 @@ enum DatabaseKind {
     },
 }
 
+#[cfg(not(target_os = "zkvm"))]
 #[derive(Debug, Error)]
 #[error("database directory path should be a valid Unicode string")]
 struct Error;
@@ -625,6 +631,7 @@ fn decompress(data: &[u8]) -> Result<Vec<u8>> {
     Decoder::new().decompress_vec(data).map_err(Into::into)
 }
 
+#[cfg(not(target_os = "zkvm"))]
 fn decompress_pair<K>((key, compressed_value): (K, Cow<[u8]>)) -> Result<(K, Vec<u8>)> {
     let value = decompress(&compressed_value)?;
     Ok((key, value))

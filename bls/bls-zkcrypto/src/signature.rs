@@ -9,6 +9,8 @@ use derive_more::From;
 use ff::Field;
 use itertools::Itertools as _;
 #[cfg(target_os = "zkvm")]
+use once_cell::sync::OnceCell;
+#[cfg(target_os = "zkvm")]
 use rand_chacha::rand_core::SeedableRng;
 use sha2::Sha256;
 
@@ -38,6 +40,13 @@ impl TryFrom<SignatureBytes> for Signature {
 
         Ok(Self(point.into()))
     }
+}
+
+#[cfg(target_os = "zkvm")]
+static RAND_SEED: once_cell::sync::OnceCell<[u8; 32]> = once_cell::sync::OnceCell::new();
+#[cfg(target_os = "zkvm")]
+pub fn set_rand_seed(seed: [u8; 32]) {
+    let _ = RAND_SEED.set(seed);
 }
 
 impl SignatureTrait for Signature {
@@ -98,7 +107,9 @@ impl SignatureTrait for Signature {
         let mut rng = rand::thread_rng();
 
         #[cfg(target_os = "zkvm")]
-        let mut rng = rand_chacha::ChaCha20Rng::from_seed([0; 32]);
+        let mut rng = rand_chacha::ChaCha20Rng::from_seed(
+            OnceCell::<[u8; 32]>::get(&RAND_SEED).unwrap().clone(),
+        );
 
         if msgs.len() != sigs.len() || sigs.len() != pks.len() {
             return false;

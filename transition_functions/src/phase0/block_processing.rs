@@ -13,6 +13,8 @@ use helper_functions::{
     verifier::{SingleVerifier, Triple, Verifier},
 };
 use pubkey_cache::PubkeyCache;
+#[cfg(not(target_os = "zkvm"))]
+use rayon::iter::ParallelIterator as _;
 use typenum::Unsigned as _;
 use types::{
     config::Config,
@@ -186,9 +188,7 @@ fn process_operations<P: Preset, V: Verifier>(
     } else {
         initialize_shuffled_indices(state, &body.attestations)?;
 
-        let triples = body
-            .attestations
-            .iter()
+        let triples = helper_functions::par_iter!(body.attestations)
             .map(|attestation| {
                 let mut triple = Triple::default();
 

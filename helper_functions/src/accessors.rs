@@ -48,7 +48,7 @@ use types::{
     },
 };
 
-use crate::{error::Error, misc, predicates};
+use crate::{error::Error, misc, par_utils, predicates};
 
 #[cfg(feature = "metrics")]
 use prometheus_metrics::METRICS;
@@ -852,7 +852,7 @@ pub fn initialize_shuffled_indices<'attestations, P: Preset>(
         need_current && !have_current,
     ) {
         (true, true) => {
-            rayon::join(initialize_previous, initialize_current);
+            par_utils::join(initialize_previous, initialize_current);
         }
         (true, false) => {
             initialize_previous();
